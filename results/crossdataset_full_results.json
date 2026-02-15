@@ -1,0 +1,23 @@
+{
+    "CIC-IDS-2017": {
+        "BiMamba+Masking (v3)": {
+            "auc": 0.8655,
+            "f1": 0.8410,
+            "notes": "Raw data validation (1.08M flows)"
+        }
+    },
+    "UNSW-NB15": {
+        "BiMamba+Masking (v3)": {
+            "auc": 0.9730,
+            "notes": "CutMix variant AUC"
+        },
+        "BERT": {
+            "auc": 0.8634
+        }
+    },
+    "Summary": {
+        "BiMamba_CutMix": 0.9730,
+        "BiMamba_Masking": 0.9545,
+        "BERT": 0.8634
+    }
+}

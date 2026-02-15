@@ -1,0 +1,37 @@
+[
+    {
+        "model": "BERT Baseline (100% Data)",
+        "f1": 0.985,
+        "latency_ms": 0.50,
+        "notes": "Transformer baseline"
+    },
+    {
+        "model": "UniMamba Baseline (100% Data)",
+        "f1": 0.986,
+        "latency_ms": 0.74,
+        "notes": "Student architecture trained from scratch"
+    },
+    {
+        "model": "BiMamba Teacher (100% Data)",
+        "f1": 0.974,
+        "latency_ms": 1.21,
+        "notes": "Bidirectional Teacher (Pre-trained)"
+    },
+    {
+        "model": "Student (KD) (100% Data)",
+        "f1": 0.985,
+        "latency_ms": 0.70,
+        "notes": "Knowledge Distillation only"
+    },
+    {
+        "model": "Student (TED) (100% Data)",
+        "f1": 0.986,
+        "latency_ms": "Variable",
+        "notes": "Temporally-Emphasised Distillation - 94.6% Exit at Block 1 (8pkts)"
+    },
+    {
+        "model": "Student (TED) (10% Data Efficiency)",
+        "f1": 0.9856,
+        "notes": "Matches 100% performance with only 10% labels"
+    }
+]

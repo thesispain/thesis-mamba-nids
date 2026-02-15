@@ -1,0 +1,21 @@
+
+# System
+__pycache__/
+*.py[cod]
+*$py.class
+.DS_Store
+
+# Logs
+*.log
+*.txt
+diff_log*
+
+# Large Data (Exceeds 100MB Github limit)
+data/*.pkl
+data/*.csv
+decision_analysis/
+
+# Temporary / Garbage
+generate_notebooks.py
+THESIS_PROMPT_v2.md
+FACULTY_PRESENTATION.md
