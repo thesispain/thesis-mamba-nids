@@ -56,8 +56,8 @@
 | Inference Latency | 1.03 ms | **0.72 ms** | <0.05 ms |
 | Buffering Needed | 32 pkts | 32 pkts | 32 pkts |
 
-**Verdict:** Deep Learning (UniMamba) **FAILS** without SSL (0.35 AUC), unlikes XGBoost which naturally generalizes (0.88).
-This proves that naive Deep Learning overfits massively compared to tabular ML.
+**Verdict:** Deep Learning (UniMamba) **FAILS** without SSL (0.35 AUC). 
+> **Why 0.35 (Worse than Random)?** This indicates **Negative Transfer**. The supervised model overfitted to specific UNSW correlations (e.g., "High Volume = Attack") that are *inverted* in CIC-IDS. It confidently predicts the wrong class. This confirms the model learned *dataset artifacts*, not security concepts.
 
 > **Problem:** To beat XGBoost, we need Deep Learning to generalize (via SSL) AND be faster (via Early Exit). UniMamba fails at generalization.
 
@@ -213,6 +213,7 @@ TED exits 99.96% of flows at Packet 8 → processes only 25% of the sequence.
 | **Speed** | TTD | **0.27 ms** |
 | **Speed** | Throughput | **32,028 flows/s** |
 | **Cost** | FLOPs Saved | **~75%** |
+| **Trade-Off** | Accuracy vs Speed | **Retains 86% Accuracy** (0.76/0.88) for **4x Speed**. <br> *Compare to XGBoost@8 which retains only 70% Accuracy (0.62/0.88).* |
 
 ---
 
