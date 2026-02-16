@@ -201,6 +201,8 @@ While BiMamba is the "Oracle" on in-domain data (F1=0.8924), it **fails to adapt
 
 **Why?** The Teacher overfits to dataset-specific patterns (exact IAT distributions, attack signatures of UNSW-NB15). When fine-tuned on a small slice of CIC-IDS (5% data), it struggles to unlearn these rigid biases.
 
+> **Note on Early Stopping:** We employ standard Early Stopping on the UNSW validation set. However, this only prevents overfitting *within* the source domain. It does not detect when the model starts learning features that degrade performance on the *target* domain (CIC-IDS). Adaptation (on target data) is the only way to robustly handle this shift.
+
 ### 5.3 The Student's Triumph: Regularization by Distillation
 The Student models (UniMamba, TED) actually **outperform** the Teacher on cross-dataset adaptation (0.8998 vs 0.7438).
 
