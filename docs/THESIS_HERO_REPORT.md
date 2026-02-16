@@ -12,14 +12,16 @@ This thesis presents a systematic evolution from traditional Machine Learning (X
 |:--|:--:|:--:|:--:|:--:|:--:|:--:|
 | **F1 (UNSW)** | 0.8942 | 0.8725 | 0.8842 | **0.8924** | 0.8836 | 0.8783 |
 | **AUC** | 0.9978 | 0.9937 | 0.9956 | **0.9975** | 0.9959 | 0.9951 |
-| **Cross-DS F1** | 0.1214 | 0.7948 | 0.8663 | 0.7438 | 0.8710 | **0.8998** |
+| **Cross-DS (Adaptation)** | 0.1214 (Zero-Shot) | 0.7948 (Few-Shot) | 0.8663 (Few-Shot) | 0.7438 (Few-Shot) | 0.8710 (Few-Shot) | **0.8998 (Few-Shot)** |
 | **Latency** | N/A | 1.03ms | 0.72ms | 1.20ms | 0.74ms | **<0.72ms** |
 | **Throughput** | N/A | 25,565 | 33,467 | 17,028 | 31,723 | **33,467** |
 | **Avg Packets** | 32 | 32 | 32 | 32 | 32 | **9.1** |
 | **Real-Time Capable** | ✅ (Causal + Fast) | ⚠️ (Slower) | ✅ (Causal + Fast) | ❌ (Bidirectional) | ✅ (Causal + Fast) | **✅ (Causal + Fast)** |
 | **Early Exit** | ❌ (Needs 32) | ❌ (Needs 32) | ❌ (Needs 32) | ❌ (Needs 32) | ❌ (Needs 32) | **✅ (Avg 9.1 pkts)** |
 | **Generalizes** | ❌ | ✅ | ✅ | ✅ | ✅ | **✅** |
+*Note: XGBoost tested Zero-Shot (fails). Neural models adapted with 5% target data (Few-Shot).*
 
+**The Evolution Story (7 Steps):**
 ![Overall Thesis Pipeline](../plots/00_overall_pipeline.png)
 
 **The Evolution Story (7 Steps):**
@@ -192,15 +194,20 @@ To push accuracy further, we train a **Bidirectional Mamba (BiMamba)** which rea
 |:--|:--|:--|:--|:--|
 | **BiMamba (Teacher)** | **0.8924** | **0.9975** | 1.20 ms | 0.7438 |
 
-### 5.2 The Overfitting Problem
-**Critical Observation:** BiMamba's **cross-dataset performance is poor** (F1=0.7438), despite having SSL pre-training. This is worse than UniMamba (0.8663)!
+### 5.2 The Teacher's Overfitting Problem
+While BiMamba is the "Oracle" on in-domain data (F1=0.8924), it **fails to adapt** to new environments.
+- **In-Domain F1:** 0.8924 (Highest)
+- **Cross-Dataset Adaptation F1:** 0.7438 (Lowest among neural models)
 
-**Why?**
-1. **100% Data Overfitting:** BiMamba is trained on **100% of UNSW-NB15** labeled data. This causes it to overfit to UNSW-specific patterns (e.g., exact IAT distributions, specific attack signatures).
-2. **Bidirectional Context:** BiMamba uses future packet information, which allows it to exploit subtle dataset-specific correlations that don't transfer.
-3. **Comparison:** UniMamba, trained on only **10% data**, is forced to learn more general patterns and thus **generalizes better**.
+**Why?** The Teacher overfits to dataset-specific patterns (exact IAT distributions, attack signatures of UNSW-NB15). When fine-tuned on a small slice of CIC-IDS (5% data), it struggles to unlearn these rigid biases.
 
-> **Lesson:** More training data + Bidirectional access = Risk of overfitting. The Teacher is **too specialized** for UNSW-NB15.
+### 5.3 The Student's Triumph: Regularization by Distillation
+The Student models (UniMamba, TED) actually **outperform** the Teacher on cross-dataset adaptation (0.8998 vs 0.7438).
+
+**How is this possible?**
+1. **Model Simplicity:** The Student checks only early packets, forcing it to learn robust, high-level structural features rather than overfitting to fine-grained tail details.
+2. **Regularization:** Distillation acts as a strong regularizer. The Student learns the "spirit" of the Teacher's knowledge (soft targets) without memorizing the noise.
+3. **Easier Target:** CIC-IDS-2017 contains more distinct attack patterns than UNSW-NB15. Once the Student adapts to the basic protocol anomalies (via 5% data), it achieves high accuracy because the task itself is slightly easier, provided the model isn't overfitted to the source.
 
 ### 5.3 Strategic Value
 - **Role:** BiMamba serves as the **Gold Standard (Oracle)** for distillation.
@@ -283,24 +290,13 @@ At Packet 32: Always EXIT (remaining ~3% ambiguous flows)
 
 > **Key Finding:** F1 barely changes after Packet 8 (+0.0012). TED successfully forces the model to learn discriminative features **early**, making the remaining 24 packets redundant for 95% of traffic.
 
-### 7.5 Why TED Beats SSL Models on Cross-Dataset
-**Surprising Result:** TED achieves the **BEST** cross-dataset generalization (F1=0.8998), even better than the SSL-pretrained models!
+### 7.5 Why TED Beats SSL in Generalization
+TED achieves **F1=0.8998** on Cross-Dataset Adaptation, beating BERT (0.79) and even the Teacher (0.74).
 
-| Model | SSL? | Cross-DS F1 | Why? |
-|:--|:--|:--|:--|
-| BiMamba (Teacher) | ✅ Yes | 0.7438 | **Overfits** to 100% UNSW data |
-| BERT | ✅ Yes | 0.7948 | Moderate overfitting |
-| UniMamba | ❌ No | 0.8663 | Less data = less overfitting |
-| KD Student | ✅ Yes (via Teacher) | 0.8710 | Distillation helps |
-| **TED (Ours)** | ✅ Yes (via Teacher) | **0.8998** | **Early Exit = Regularization!** |
-
-**Explanation:**
-1. **SSL helps** (compare BERT 0.79 vs XGBoost 0.72), but it's not the only factor.
-2. **Early Exit acts as regularization:**
-   - TED must make decisions at **Packet 8** (not 32).
-   - It **cannot rely on** dataset-specific patterns that only appear in later packets (e.g., UNSW-specific flow termination patterns at Packet 25-30).
-   - This forces TED to learn **robust early features** that generalize better.
-3. **Combination:** SSL (pre-training) + Early Exit (regularization) + KD (teacher guidance) = **Best generalization**.
+**The "Early Exit" Regularizer:**
+- By forcing the model to classify at **Packet 8**, we prevent it from relying on deep, dataset-specific payloads found in later packets.
+- This forces the model to learn **header-based anomalies** (protocol violations), which are universal across datasets.
+- **Result:** A model that adapts faster and better to new networks than deep, overfitted transformers.
 
 > **Insight:** Early Exit doesn't just speed up inference — it also **prevents overfitting** by limiting the model's access to fine-grained, dataset-specific patterns in the tail of the sequence.
 
