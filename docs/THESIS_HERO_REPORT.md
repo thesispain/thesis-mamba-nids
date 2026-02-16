@@ -11,17 +11,17 @@ This thesis presents a systematic evolution from traditional Machine Learning (X
 | Capability | XGBoost | BERT | UniMamba | BiMamba | KD Student | **TED (Ours)** |
 |:--|:--:|:--:|:--:|:--:|:--:|:--:|
 | **F1 (UNSW)** | 0.8942 | 0.8725 | 0.8842 | **0.8924** | 0.8836 | 0.8783 |
-| **AUC** | 0.9978 | 0.9937 | 0.9956 | **0.9975** | 0.9959 | 0.9951 |
-| **Cross-DS (Adaptation)** | 0.1214 (Zero-Shot) | 0.7948 (Few-Shot) | 0.8663 (Few-Shot) | 0.7438 (Few-Shot) | 0.8710 (Few-Shot) | **0.8998 (Few-Shot)** |
-| **Latency** | N/A | 1.03ms | 0.72ms | 1.20ms | 0.74ms | **<0.72ms** |
+| **AUC (UNSW)** | 0.9978 | 0.9937 | 0.9956 | **0.9975** | 0.9959 | 0.9951 |
+| **Cross-DS AUC (Zero-Shot)** | 0.56 | 0.58 | **0.84** | 0.73 | 0.44 | 0.24 |
+| **Cross-DS F1 (Adapted 5%)** | 0.12 | 0.79 | 0.87 | 0.74 | 0.87 | **0.90** |
+| **Latency** | <0.05ms | 1.03ms | 0.72ms | 1.20ms | 0.74ms | **<0.72ms** |
 | **Throughput** | N/A | 25,565 | 33,467 | 17,028 | 31,723 | **33,467** |
 | **Avg Packets** | 32 | 32 | 32 | 32 | 32 | **9.1** |
-| **Real-Time Capable** | ✅ (Causal + Fast) | ⚠️ (Slower) | ✅ (Causal + Fast) | ❌ (Bidirectional) | ✅ (Causal + Fast) | **✅ (Causal + Fast)** |
-| **Early Exit** | ❌ (Needs 32) | ❌ (Needs 32) | ❌ (Needs 32) | ❌ (Needs 32) | ❌ (Needs 32) | **✅ (Avg 9.1 pkts)** |
-| **Generalizes** | ❌ | ✅ | ✅ | ✅ | ✅ | **✅** |
-*Note: XGBoost tested Zero-Shot (fails). Neural models adapted with 5% target data (Few-Shot).*
+| **Real-Time** | ✅ | ⚠️ Slower | ✅ | ❌ Bidir | ✅ | **✅** |
+| **Early Exit** | ❌ | ❌ | ❌ | ❌ | ❌ | **✅ (9.1 pkts)** |
 
-**The Evolution Story (7 Steps):**
+> **Key:** Zero-Shot = trained on UNSW, tested directly on CIC-IDS (no target labels). Adapted = fine-tuned on 5% CIC-IDS labels.
+
 ![Overall Thesis Pipeline](../plots/00_overall_pipeline.png)
 
 **The Evolution Story (7 Steps):**
@@ -123,9 +123,9 @@ To solve the generalization problem, we adopt a **Transformer-based framework** 
 ### 3.2 BERT Results (UNSW-NB15)
 | Metric | XGBoost | **BERT** | Comparison |
 |:--|:--|:--|:--|
-| **F1 Score** | 0.8845 | **0.8725** | -1.2% (Acceptable trade-off) |
-| **AUC** | 0.9977 | **0.9937** | -0.4% |
-| **Cross-DS (Adaptation)** | 0.1214 | **0.7948** | **+67.3% (Huge Leap via Few-Shot)** |
+| **F1 Score** | 0.8942 | **0.8725** | -2.2% (Acceptable trade-off) |
+| **AUC** | 0.9978 | **0.9937** | -0.4% |
+| **Cross-DS AUC (Zero-Shot)** | 0.56 | **0.58** | Similar (both fail at classification) |
 
 ### 3.3 BERT's Unsupervised Cross-Dataset Power
 The SSL features are so robust that even **without any labels**, the model detects anomalies on CIC-IDS:
