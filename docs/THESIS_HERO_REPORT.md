@@ -11,7 +11,6 @@ This thesis presents a systematic evolution from traditional Machine Learning (X
 | Capability | XGBoost | BERT | UniMamba | BiMamba | KD Student | **TED (Ours)** |
 |:--|:--:|:--:|:--:|:--:|:--:|:--:|
 | **F1 (UNSW)** | 0.8845 | 0.8725 | 0.8842 | **0.8924** | 0.8836 | 0.8783 |
-| **AUC** | 0.9977 | 0.9937 | 0.9956 | **0.9975** | 0.9959 | 0.9951 |
 | **Cross-DS F1** | 0.7195 | 0.7948 | 0.8663 | 0.7438 | 0.8710 | **0.8998** |
 | **Latency** | N/A | 1.03ms | 0.72ms | 1.20ms | 0.74ms | **<0.72ms** |
 | **Throughput** | N/A | 25,565 | 33,467 | 17,028 | 31,723 | **33,467** |
@@ -99,7 +98,16 @@ We trained XGBoost on UNSW-NB15 and tested on CIC-IDS-2017 (Zero-Shot):
 
 > **Critical Finding:** XGBoost memorizes dataset-specific attack signatures (e.g., exact packet lengths in UNSW attacks vs. CIC-IDS attacks). When attack tools change, the model **fails to detect new attack variants**. This is catastrophic for production NIDS — **missing 1 in 3 attacks is unacceptable**.
 
-**Comparison to Literature:** Supervised models exhibit similar cross-dataset failures (DNN: 60% accuracy, XGBoost: 72% F1). XGBoost **cannot learn transferable representations** — it finds optimal thresholds for fixed features, not attack *behavior*.
+**Comparison to Literature:** Supervised models exhibit similar cross-dataset failures. The reference paper reports:
+
+| Train → Test | Supervised DNN Accuracy |
+|:--|:--|
+| CICIDS → UNSW-NB | **60%** |
+| UNSW-NB → CICIDS | **62%** |
+| UNSW-NB → CTU | **54%** |
+| CTU → UNSW-NB | **55%** |
+
+Our XGBoost result (72% F1, 65% Recall) aligns with the literature: **supervised models fundamentally cannot generalize** because they memorize dataset-specific decision boundaries, not attack *behavior*.
 
 ![Cross-Dataset Generalization Gap](../plots/02_cross_dataset_gap.png)
 
