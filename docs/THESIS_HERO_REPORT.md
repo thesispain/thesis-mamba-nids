@@ -28,6 +28,8 @@ This thesis presents a systematic evolution from traditional Machine Learning (X
 6. **Dynamic TED:** Adds early exit, but per-packet GPU↔CPU switching creates overhead.
 7. **Blockwise TED (Final):** Checks at Packet 8/16/32. 95% of flows exit at Packet 8. **3.5x less compute.**
 
+![The Evolution Story](../plots/06_evolution_story.png)
+
 ---
 
 ## 1. Dataset & Experimental Setup
@@ -90,6 +92,8 @@ We trained XGBoost on UNSW-NB15 and tested on CIC-IDS-2017 (Zero-Shot):
 | **Drop** | **-16.5%** | **-12.0%** | **-10.7%** |
 
 > **Critical Finding:** XGBoost memorizes dataset-specific feature distributions (e.g., exact packet lengths, specific flag combinations). When the distribution changes (different network, different attack tools), performance collapses. XGBoost **cannot learn transferable representations** — it simply finds optimal decision boundaries for a fixed feature space.
+
+![Cross-Dataset Generalization Gap](../plots/02_cross_dataset_gap.png)
 
 ---
 
@@ -161,6 +165,10 @@ UniMamba is trained **from scratch** (Random Init, no SSL) with the same paramet
 | **XGBoost** | N/A | N/A | ~2 GB | 0.7195 |
 | **BERT** | 4.59M | 1.03ms | ~6-7 GB | 0.7948 |
 | **UniMamba** | **1.95M** | **0.72ms** | **~2 GB** | **0.8663** |
+
+![In-Domain F1 Score Comparison](../plots/01_f1_comparison.png)
+
+![Latency Comparison](../plots/03_latency_comparison.png)
 
 ---
 
@@ -255,6 +263,8 @@ At Packet 32: Always EXIT (remaining ~3% ambiguous flows)
 
 > **Key Finding:** F1 barely changes after Packet 8 (+0.0012). TED successfully forces the model to learn discriminative features **early**, making the remaining 24 packets redundant for 95% of traffic.
 
+![TED Early Exit Distribution](../plots/04_exit_distribution.png)
+
 ---
 
 ## 8. Time-to-Detection (TTD)
@@ -290,6 +300,8 @@ The ultimate metric for a real-time NIDS is **how quickly** it can classify a fl
 | **Real-Time** | 1 | 962 | **1,475** | **UniMamba (+53%)** |
 
 > **Thesis Defense:** NIDS operates in the "Real-Time" or "NIDS Buffer" regime. In these realistic scenarios, Mamba dominates. BERT's high offline throughput is irrelevant for a firewall that must block attacks instantly.
+
+![Throughput Scaling: Batch vs Real-Time](../plots/05_throughput_scaling.png)
 
 ---
 
