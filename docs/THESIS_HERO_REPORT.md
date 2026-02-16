@@ -16,7 +16,8 @@ This thesis presents a systematic evolution from traditional Machine Learning (X
 | **Latency** | N/A | 1.03ms | 0.72ms | 1.20ms | 0.74ms | **<0.72ms** |
 | **Throughput** | N/A | 25,565 | 33,467 | 17,028 | 31,723 | **33,467** |
 | **Avg Packets** | 32 | 32 | 32 | 32 | 32 | **9.1** |
-| **Real-Time** | ❌ | ❌ | ✅ | ❌ | ✅ | **✅** |
+| **Real-Time Capable** | ✅ (Causal + Fast) | ⚠️ (Slower) | ✅ (Causal + Fast) | ❌ (Bidirectional) | ✅ (Causal + Fast) | **✅ (Causal + Fast)** |
+| **Early Exit** | ❌ (Needs 32) | ❌ (Needs 32) | ❌ (Needs 32) | ❌ (Needs 32) | ❌ (Needs 32) | **✅ (Avg 9.1 pkts)** |
 | **Generalizes** | ❌ | ✅ | ✅ | ✅ | ✅ | **✅** |
 
 **The Evolution Story (7 Steps):**
@@ -123,15 +124,17 @@ The SSL features are so robust that even **without any labels**, the model detec
 
 This proves the features are **truly generalizable** — the model understands "what normal traffic looks like" regardless of the specific network.
 
-### 3.4 BERT's Fatal Flaw: O(N²) Complexity
-| Metric | Result | Problem |
+### 3.4 BERT's Limitation: Latency Trade-off
+Importantly, BERT **can** process flows in real-time using a straightforward pipeline that captures initial patterns as they emerge. However, the $O(N^2)$ attention mechanism introduces a **latency penalty**:
+
+| Metric | Result | Impact |
 |:--|:--|:--|
-| **Latency** | **1.03 ms/flow** | Too slow for 10Gbps+ networks |
-| **Throughput (B=32)** | 25,565 flows/s | Buffer delay >1ms per batch |
+| **Latency** | **1.03 ms/flow** | **30% slower** than Mamba (acceptable but suboptimal) |
+| **Throughput (B=32)** | 25,565 flows/s | Lower than required for 10Gbps+ networks |
 | **Training VRAM** | **~6-7 GB** | Expensive to train |
 | **Parameters** | 4.59M | Heavy |
 
-> **The Dilemma:** BERT solves generalization but creates a latency bottleneck. Self-Attention computes pairwise relationships between ALL packets ($O(N^2)$), which is wasteful for sequential network data where Packet 1 has no reason to "attend" to Packet 32.
+> **The Trade-off:** BERT solves generalization but is **slower** than optimal. While it can process flows in real-time, the 1.03ms latency is **30% higher** than necessary, which becomes problematic at scale (high-speed networks, resource-constrained edge devices).
 
 ---
 
@@ -177,16 +180,25 @@ UniMamba is trained **from scratch** (Random Init, no SSL) with the same paramet
 To push accuracy further, we train a **Bidirectional Mamba (BiMamba)** which reads flows forward AND backward. This maximizes context but doubles computation.
 
 ### 5.1 Oracle Results
-| Model | F1 | AUC | Latency | Role |
+| Model | F1 | AUC | Latency | Cross-DS F1 |
 |:--|:--|:--|:--|:--|
-| **BiMamba (Teacher)** | **0.8924** | **0.9975** | 1.20 ms | Oracle / Gold Standard |
+| **BiMamba (Teacher)** | **0.8924** | **0.9975** | 1.20 ms | 0.7438 |
 
-### 5.2 The Training Pipeline
-1. **Phase 1 (SSL):** BiMamba learns "the language of networks" from unlabeled data.
-2. **Phase 2 (Oracle):** Fine-tune on **100% labeled data** → becomes the **"Oracle Teacher"**.
-3. **Phase 3 (Distillation):** Oracle teaches the fast UniMamba student on 10% data.
+### 5.2 The Overfitting Problem
+**Critical Observation:** BiMamba's **cross-dataset performance is poor** (F1=0.7438), despite having SSL pre-training. This is worse than UniMamba (0.8663)!
 
-> **Why not deploy BiMamba?** Latency = 1.20ms (slower than BERT!). Bidirectional processing requires buffering the entire flow, which is incompatible with real-time stream processing.
+**Why?**
+1. **100% Data Overfitting:** BiMamba is trained on **100% of UNSW-NB15** labeled data. This causes it to overfit to UNSW-specific patterns (e.g., exact IAT distributions, specific attack signatures).
+2. **Bidirectional Context:** BiMamba uses future packet information, which allows it to exploit subtle dataset-specific correlations that don't transfer.
+3. **Comparison:** UniMamba, trained on only **10% data**, is forced to learn more general patterns and thus **generalizes better**.
+
+> **Lesson:** More training data + Bidirectional access = Risk of overfitting. The Teacher is **too specialized** for UNSW-NB15.
+
+### 5.3 Strategic Value
+- **Role:** BiMamba serves as the **Gold Standard (Oracle)** for distillation.
+- **Latency Cost:** 1.20ms (slower than BERT!).
+- **Not Deployable:** Too slow + poor cross-dataset performance.
+- **Solution:** Use it to **teach** the fast UniMamba student via Knowledge Distillation.
 
 ---
 
@@ -262,6 +274,27 @@ At Packet 32: Always EXIT (remaining ~3% ambiguous flows)
 | **Packet 32** | 0.8825 | 0.9952 | 0.797 |
 
 > **Key Finding:** F1 barely changes after Packet 8 (+0.0012). TED successfully forces the model to learn discriminative features **early**, making the remaining 24 packets redundant for 95% of traffic.
+
+### 7.5 Why TED Beats SSL Models on Cross-Dataset
+**Surprising Result:** TED achieves the **BEST** cross-dataset generalization (F1=0.8998), even better than the SSL-pretrained models!
+
+| Model | SSL? | Cross-DS F1 | Why? |
+|:--|:--|:--|:--|
+| BiMamba (Teacher) | ✅ Yes | 0.7438 | **Overfits** to 100% UNSW data |
+| BERT | ✅ Yes | 0.7948 | Moderate overfitting |
+| UniMamba | ❌ No | 0.8663 | Less data = less overfitting |
+| KD Student | ✅ Yes (via Teacher) | 0.8710 | Distillation helps |
+| **TED (Ours)** | ✅ Yes (via Teacher) | **0.8998** | **Early Exit = Regularization!** |
+
+**Explanation:**
+1. **SSL helps** (compare BERT 0.79 vs XGBoost 0.72), but it's not the only factor.
+2. **Early Exit acts as regularization:**
+   - TED must make decisions at **Packet 8** (not 32).
+   - It **cannot rely on** dataset-specific patterns that only appear in later packets (e.g., UNSW-specific flow termination patterns at Packet 25-30).
+   - This forces TED to learn **robust early features** that generalize better.
+3. **Combination:** SSL (pre-training) + Early Exit (regularization) + KD (teacher guidance) = **Best generalization**.
+
+> **Insight:** Early Exit doesn't just speed up inference — it also **prevents overfitting** by limiting the model's access to fine-grained, dataset-specific patterns in the tail of the sequence.
 
 ![TED Early Exit Distribution](../plots/04_exit_distribution.png)
 
