@@ -93,6 +93,9 @@ This proves that naive Deep Learning overfits massively compared to tabular ML.
 
 **Why KD matters:** Cross-dataset jumps from **0.35 → 0.86**. The Teacher's SSL knowledge completely transforms the Student's generalization ability, without sacrificing speed.
 
+> **Theoretical Note (Regulated Distillation):**
+> It is common for the Student (0.86) to slightly outperform the Teacher (0.83) on unseen data. The large Teacher model often **overfits** to noise in the training data (UNSW). The Student, trained on "soft probabilities", learns a **smoother decision boundary** that ignores this noise and generalizes better.
+
 **Verdict:** Teacher's SSL knowledge + Student's speed. But still waits for all **32 packets**.
 
 > **Problem it creates:** Processes all 32 packets even for obvious attacks (DoS flood detectable at packet 3).
