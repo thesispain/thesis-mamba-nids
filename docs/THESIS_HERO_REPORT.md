@@ -125,7 +125,7 @@ To solve the generalization problem, we adopt a **Transformer-based framework** 
 |:--|:--|:--|:--|
 | **F1 Score** | 0.8845 | **0.8725** | -1.2% (Acceptable trade-off) |
 | **AUC** | 0.9977 | **0.9937** | -0.4% |
-| **Cross-DS F1** | 0.7195 | **0.7948** | **+10.5% (Generalization!)** |
+| **Cross-DS (Adaptation)** | 0.1214 | **0.7948** | **+67.3% (Huge Leap via Few-Shot)** |
 
 ### 3.3 BERT's Unsupervised Cross-Dataset Power
 The SSL features are so robust that even **without any labels**, the model detects anomalies on CIC-IDS:
@@ -135,11 +135,11 @@ The SSL features are so robust that even **without any labels**, the model detec
 This proves the features are **truly generalizable** — the model understands "what normal traffic looks like" regardless of the specific network.
 
 ### 3.4 BERT's Limitation: Latency Trade-off
-Importantly, BERT **can** process flows in real-time using a straightforward pipeline that captures initial patterns as they emerge. However, the $O(N^2)$ attention mechanism introduces a **latency penalty**:
+Importantly, BERT **can** process flows in real-time. However, the $O(N^2)$ attention mechanism introduces a significant **latency penalty** compared to XGBoost and Mamba:
 
 | Metric | Result | Impact |
 |:--|:--|:--|
-| **Latency** | **1.03 ms/flow** | **30% slower** than Mamba (acceptable but suboptimal) |
+| **Latency** | **1.03 ms/flow** | **~20x slower** than XGBoost (<0.05ms). 30% slower than Mamba. |
 | **Throughput (B=32)** | 25,565 flows/s | Lower than required for 10Gbps+ networks |
 | **Training VRAM** | **~6-7 GB** | Expensive to train |
 | **Parameters** | 4.59M | Heavy |
