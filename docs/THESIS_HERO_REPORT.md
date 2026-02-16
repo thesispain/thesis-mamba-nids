@@ -10,8 +10,9 @@ This thesis presents a systematic evolution from traditional Machine Learning (X
 **The Final Victory Table:**
 | Capability | XGBoost | BERT | UniMamba | BiMamba | KD Student | **TED (Ours)** |
 |:--|:--:|:--:|:--:|:--:|:--:|:--:|
-| **F1 (UNSW)** | 0.8845 | 0.8725 | 0.8842 | **0.8924** | 0.8836 | 0.8783 |
-| **Cross-DS F1** | 0.7195 | 0.7948 | 0.8663 | 0.7438 | 0.8710 | **0.8998** |
+| **F1 (UNSW)** | 0.8942 | 0.8725 | 0.8842 | **0.8924** | 0.8836 | 0.8783 |
+| **AUC** | 0.9978 | 0.9937 | 0.9956 | **0.9975** | 0.9959 | 0.9951 |
+| **Cross-DS F1** | 0.1214 | 0.7948 | 0.8663 | 0.7438 | 0.8710 | **0.8998** |
 | **Latency** | N/A | 1.03ms | 0.72ms | 1.20ms | 0.74ms | **<0.72ms** |
 | **Throughput** | N/A | 25,565 | 33,467 | 17,028 | 31,723 | **33,467** |
 | **Avg Packets** | 32 | 32 | 32 | 32 | 32 | **9.1** |
@@ -78,36 +79,26 @@ XGBoost operates on **tabular data** — it cannot process raw packet sequences.
 ### 2.2 XGBoost Results (UNSW-NB15)
 | Metric | Result | Analysis |
 |:--|:--|:--|
-| **F1 Score** | **0.8845** | Excellent in-domain accuracy |
-| **AUC** | **0.9977** | Near-perfect discrimination |
-| **Accuracy** | **0.9852** | High overall correctness |
+| **F1 Score** | **0.8942** | Excellent in-domain accuracy |
+| **AUC** | **0.9978** | Near-perfect discrimination |
+| **Accuracy** | **0.9875** | High overall correctness |
 
 ### 2.3 The Fatal Flaw: Zero Generalization
 We trained XGBoost on UNSW-NB15 and tested on CIC-IDS-2017 (Zero-Shot):
 
-| Dataset | F1 Score | **Attack Recall** | Accuracy |
-|:--|:--|:--|:--|
-| **UNSW (In-Domain)** | **0.8845** | **95.2%** | **98.5%** |
-| **CIC-IDS (Cross-Dataset)** | **0.7195** | **65.3%** | 87.8% |
-| **Drop** | **-16.5%** | **-29.9%** | -10.7% |
+| Dataset | F1 Score | AUC | **Attack Recall** | Accuracy |
+|:--|:--|:--|:--|:--|
+| **UNSW (In-Domain)** | **0.8942** | **0.9978** | **93.6%** | **98.8%** |
+| **CIC-IDS (Cross-Dataset)** | **0.1214** | **0.5644** | **10.9%** | 70.4% |
+| **Drop** | **-77.3%** | **-43.3%** | **-82.7%** | **-28.4%** |
 
-**The Class Imbalance Trap:**
-- CIC-IDS is **81.3% benign** traffic.
-- XGBoost achieves 87.8% accuracy simply by predicting "benign" most of the time.
-- But **34.7% of attacks go undetected** (Recall drops from 95% → 65%)!
+**The Catastrophic Collapse:**
+- XGBoost's F1 drops from **0.89 → 0.12** (a **77% collapse**).
+- AUC drops from **0.99 → 0.56** (barely better than random coin flip).
+- **89% of attacks go undetected** (Recall: 93.6% → 10.9%).
+- The model essentially **stops working** on a different network.
 
-> **Critical Finding:** XGBoost memorizes dataset-specific attack signatures (e.g., exact packet lengths in UNSW attacks vs. CIC-IDS attacks). When attack tools change, the model **fails to detect new attack variants**. This is catastrophic for production NIDS — **missing 1 in 3 attacks is unacceptable**.
-
-**Comparison to Literature:** Supervised models exhibit similar cross-dataset failures. The reference paper reports:
-
-| Train → Test | Supervised DNN Accuracy |
-|:--|:--|
-| CICIDS → UNSW-NB | **60%** |
-| UNSW-NB → CICIDS | **62%** |
-| UNSW-NB → CTU | **54%** |
-| CTU → UNSW-NB | **55%** |
-
-Our XGBoost result (72% F1, 65% Recall) aligns with the literature: **supervised models fundamentally cannot generalize** because they memorize dataset-specific decision boundaries, not attack *behavior*.
+> **Critical Finding:** XGBoost memorizes dataset-specific attack signatures (e.g., exact packet lengths, IAT distributions unique to UNSW-NB15). When the network environment changes (different attack tools, different traffic patterns), the learned decision boundaries become meaningless. XGBoost **cannot learn transferable representations** — it finds optimal thresholds for a specific feature space that do not generalize.
 
 ![Cross-Dataset Generalization Gap](../plots/02_cross_dataset_gap.png)
 
