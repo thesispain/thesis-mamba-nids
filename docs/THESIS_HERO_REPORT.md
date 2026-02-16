@@ -20,6 +20,8 @@ This thesis presents a systematic evolution from traditional Machine Learning (X
 | **Early Exit** | ❌ (Needs 32) | ❌ (Needs 32) | ❌ (Needs 32) | ❌ (Needs 32) | ❌ (Needs 32) | **✅ (Avg 9.1 pkts)** |
 | **Generalizes** | ❌ | ✅ | ✅ | ✅ | ✅ | **✅** |
 
+![Overall Thesis Pipeline](../plots/00_overall_pipeline.png)
+
 **The Evolution Story (7 Steps):**
 1. **XGBoost (Baseline):** High accuracy but zero generalization — memorizes dataset-specific patterns.
 2. **BERT + SSL:** Solves generalization via self-supervised learning, but $O(N^2)$ complexity → slow.
