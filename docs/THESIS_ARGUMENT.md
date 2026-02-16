@@ -16,11 +16,13 @@
 | **Buffering Latency** | **high (Must wait for 32 packets)** |
 | **Cross-DS Zero-Shot AUC** | **0.8776** (Excellent Baseline) |
 
-**Verdict:** XGBoost is the **Accuracy Champion**. It generalizes well (0.88 AUC). 
-**However**, it is fundamentally a **batch processor**. To form its feature vector, it must wait for the *entire flow context* (32 packets).
+**Verdict:** XGBoost is the **Accuracy Champion** on full flows.
+**However**, it is fundamentally **"Blind" to Sequence**.
+> **Why?** XGBoost relies on *Statistical Features* (counts, rates, averages, time-windows). These features are aggregate properties that require a sufficient sample size to stabilize.
+> **The Consequence:** At 8 packets, statistical features are noisy and meaningless. XGBoost cannot see the *sequential conversation* (e.g., handshake anomalies). It *must* wait for the statistics to accrue (32 packets) to work.
 
-> **Critical Experiment:** If we force XGBoost to predict using only the first 8 packets (like TED), its Cross-DS AUC **collapses to 0.62**. It *needs* the full 32 packets to generalize.
-> **Problem:** High **Time-To-Detect (TTD)**. We need something as accurate as XGBoost (32) but as fast as XGBoost (8). XGBoost (8) fails. We need DL.
+> **Critical Proof:** When forced to predict at Packet 8, XGBoost's Cross-DS AUC **collapses to 0.62**. It *cannot* detect early because the stats aren't ready.
+> **Solution:** Mamba sees the *sequence* immediately. It detects the attack pattern *within* the first 8 packets (0.76 AUC), without needing to wait for the statistics to stabilize.
 
 ---
 
@@ -157,7 +159,7 @@ Packet 32: Always EXIT (remaining ~3% ambiguous)
 | **Packets Needed** | **32** | 32 | 32 | 32 | 32 | **9.1** |
 | **Real-Time** | ❌ (Buffering) | ❌ | ❌ | ❌ | ❌ | **✅** |
 
-> **Why XGBoost isn't Real-Time:** Ideally, XGBoost (8 pkts) would be the winner. But our experiments show `XGBoost @ Packet 8` collapses to **0.62 AUC**. TED (Packet 8) maintains **0.76 AUC** because of Distillation.
+> **Why XGBoost isn't Real-Time:** Ideally, XGBoost (8 pkts) would be the winner. But it fails because it is **statistically blind**. It needs time to count up statistics. Deep Learning (TED) succeeds (**0.76 AUC**) because it reads the **semantics** of the first 8 packets.
 > **TED is the only system that works at Packet 8.**
 
 > **Note:** "Zero-Shot" means the model was **never trained** on the second dataset (CIC-IDS). It is testing pure generalization (AUC). We use AUC because F1 requires threshold tuning which is impossible in a zero-shot setting.
