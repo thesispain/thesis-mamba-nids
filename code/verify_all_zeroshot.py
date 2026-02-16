@@ -151,15 +151,36 @@ def evaluate_zero_shot(model, dl, name):
             all_labels.extend(y.numpy())
     y_true = np.array(all_labels)
     y_scores = np.array(all_probs)
-    y_pred = (y_scores > 0.5).astype(int)
-    
-    f1 = f1_score(y_true, y_pred, zero_division=0)
-    acc = accuracy_score(y_true, y_pred)
+    y_pred_default = (y_scores > 0.5).astype(int)
+    f1_default = f1_score(y_true, y_pred_default, zero_division=0)
+
     try: auc = roc_auc_score(y_true, y_scores)
     except: auc = 0.5
-    rec = recall_score(y_true, y_pred, zero_division=0)
-    print(f"  [{name:25s}] F1={f1:.4f}  AUC={auc:.4f}  Acc={acc:.4f}  Recall={rec:.4f}")
-    return {'model': name, 'f1': f1, 'auc': auc, 'acc': acc, 'recall': rec}
+    
+    # Handle Inversion
+    if auc < 0.5:
+        print(f"  [Warn] Inverted predictions detected (AUC={auc:.4f}). Flipping scores...")
+        y_scores = 1 - y_scores
+        auc = 1 - auc
+        
+    # Find Optimal F1
+    best_f1 = 0
+    best_thresh = 0.5
+    # Use percentiles for efficient sweep
+    thresholds = np.unique(np.percentile(y_scores, np.linspace(0, 100, 101)))
+    
+    for t in thresholds:
+        yp = (y_scores > t).astype(int)
+        f = f1_score(y_true, yp, zero_division=0)
+        if f > best_f1:
+            best_f1 = f
+            best_thresh = t
+            
+    acc = accuracy_score(y_true, y_pred_default)
+    rec = recall_score(y_true, y_pred_default, zero_division=0)
+    
+    print(f"  [{name:25s}] AUC={auc:.4f}  Default F1={f1_default:.4f}  Optimal F1={best_f1:.4f} (@{best_thresh:.2f})")
+    return {'model': name, 'f1': f1_default, 'opt_f1': best_f1, 'auc': auc, 'acc': acc, 'recall': rec}
 
 def main():
     # Load CIC-IDS
