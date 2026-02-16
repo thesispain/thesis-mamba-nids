@@ -17,9 +17,10 @@
 | **Cross-DS Zero-Shot AUC** | **0.8776** (Excellent Baseline) |
 
 **Verdict:** XGBoost is the **Accuracy Champion**. It generalizes well (0.88 AUC). 
-**However**, it is fundamentally a **batch processor**. To form its feature vector, it must wait for the *entire flow context* (32 packets). It cannot detect attacks at Packet 1 or 8.
+**However**, it is fundamentally a **batch processor**. To form its feature vector, it must wait for the *entire flow context* (32 packets).
 
-> **Problem it creates:** High **Time-To-Detect (TTD)** because of buffering delay. We need something as accurate as XGBoost but faster to react.
+> **Critical Experiment:** If we force XGBoost to predict using only the first 8 packets (like TED), its Cross-DS AUC **collapses to 0.62**. It *needs* the full 32 packets to generalize.
+> **Problem:** High **Time-To-Detect (TTD)**. We need something as accurate as XGBoost (32) but as fast as XGBoost (8). XGBoost (8) fails. We need DL.
 
 ---
 
@@ -151,10 +152,13 @@ Packet 32: Always EXIT (remaining ~3% ambiguous)
 |:--|:--:|:--:|:--:|:--:|:--:|:--:|
 | **F1** | 0.8942 | 0.8725 | 0.8807 | 0.8924 | 0.8836 | 0.8783 |
 | **AUC** | **0.9978** | 0.9937 | 0.9953 | **0.9975** | 0.9959 | 0.9951 |
-| **Cross-DS Zero-Shot AUC** | 0.12 | 0.58 | 0.35 | **0.83** | **0.86** | **0.76** |
+| **Cross-DS Zero-Shot AUC** | 0.88 | 0.58 | 0.35 | **0.83** | **0.86** | **0.76** |
 | **Latency** | **<0.05** | 1.03 | 0.72 | 1.20 | 0.74 | **<0.72** |
-| **Packets** | 32 | 32 | 32 | 32 | 32 | **9.1** |
-| **Real-Time** | ✅ | ❌ | ✅ | ❌ | ✅ | **✅** |
+| **Packets Needed** | **32** | 32 | 32 | 32 | 32 | **9.1** |
+| **Real-Time** | ❌ (Buffering) | ❌ | ❌ | ❌ | ❌ | **✅** |
+
+> **Why XGBoost isn't Real-Time:** Ideally, XGBoost (8 pkts) would be the winner. But our experiments show `XGBoost @ Packet 8` collapses to **0.62 AUC**. TED (Packet 8) maintains **0.76 AUC** because of Distillation.
+> **TED is the only system that works at Packet 8.**
 
 > **Note:** "Zero-Shot" means the model was **never trained** on the second dataset (CIC-IDS). It is testing pure generalization (AUC). We use AUC because F1 requires threshold tuning which is impossible in a zero-shot setting.
 
