@@ -1,11 +1,18 @@
-{
-  "cells": [
-    {
-      "cell_type": "code",
-      "execution_count": null,
-      "metadata": {},
-      "outputs": [],
-      "source": [
+
+import json
+import os
+
+NOTEBOOK_PATH = "Part1_SSL_Pretraining.ipynb"
+
+cells = []
+
+# Cell 1: Imports
+cells.append({
+    "cell_type": "code",
+    "execution_count": None,
+    "metadata": {},
+    "outputs": [],
+    "source": [
         "import os, sys, torch, pickle, time\n",
         "import numpy as np\n",
         "import torch.nn as nn\n",
@@ -13,27 +20,31 @@
         "\n",
         "DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')\n",
         "print(f\"Device: {DEVICE}\")"
-      ]
-    },
-    {
-      "cell_type": "code",
-      "execution_count": null,
-      "metadata": {},
-      "outputs": [],
-      "source": [
+    ]
+})
+
+# Cell 2: Config & Constants
+cells.append({
+    "cell_type": "code",
+    "execution_count": None,
+    "metadata": {},
+    "outputs": [],
+    "source": [
         "DATA_FILE = \"../Organized_Final/data/unswnb15_full/finetune_mixed.pkl\"\n",
         "WEIGHTS_DIR = \"weights/ssl\"\n",
         "os.makedirs(WEIGHTS_DIR, exist_ok=True)\n",
         "print(f\"Data Path: {DATA_FILE}\")\n",
         "print(f\"Weights Dir: {WEIGHTS_DIR}\")"
-      ]
-    },
-    {
-      "cell_type": "code",
-      "execution_count": null,
-      "metadata": {},
-      "outputs": [],
-      "source": [
+    ]
+})
+
+# Cell 3: Data Loading (Benign Only)
+cells.append({
+    "cell_type": "code",
+    "execution_count": None,
+    "metadata": {},
+    "outputs": [],
+    "source": [
         "class FlowDataset(Dataset):\n",
         "    def __init__(self, data):\n",
         "        self.data = data\n",
@@ -57,14 +68,16 @@
         "dataset = FlowDataset(benign_flows)\n",
         "dataloader = DataLoader(dataset, batch_size=128, shuffle=True, drop_last=True)\n",
         "print(\"DataLoader ready.\")"
-      ]
-    },
-    {
-      "cell_type": "code",
-      "execution_count": null,
-      "metadata": {},
-      "outputs": [],
-      "source": [
+    ]
+})
+
+# Cell 4: Model Definition (BERT with CLS Token)
+cells.append({
+    "cell_type": "code",
+    "execution_count": None,
+    "metadata": {},
+    "outputs": [],
+    "source": [
         "class PacketEmbedder(nn.Module):\n",
         "    def __init__(self, d_model=256):\n",
         "        super().__init__()\n",
@@ -114,14 +127,16 @@
         "        return self.proj_head(feat[:, 0, :]), None\n",
         "\n",
         "print(\"BertEncoder (CLS) Defined.\")"
-      ]
-    },
-    {
-      "cell_type": "code",
-      "execution_count": null,
-      "metadata": {},
-      "outputs": [],
-      "source": [
+    ]
+})
+
+# Cell 5: Loss and Augmentation
+cells.append({
+    "cell_type": "code",
+    "execution_count": None,
+    "metadata": {},
+    "outputs": [],
+    "source": [
         "class NTXentLoss(nn.Module):\n",
         "    def __init__(self, temperature=0.5):\n",
         "        super().__init__()\n",
@@ -148,14 +163,16 @@
         "    return aug\n",
         "\n",
         "print(\"Helpers Defined.\")"
-      ]
-    },
-    {
-      "cell_type": "code",
-      "execution_count": null,
-      "metadata": {},
-      "outputs": [],
-      "source": [
+    ]
+})
+
+# Cell 6: Training Loop
+cells.append({
+    "cell_type": "code",
+    "execution_count": None,
+    "metadata": {},
+    "outputs": [],
+    "source": [
         "model = BertEncoder().to(DEVICE)\n",
         "model.train()\n",
         "optimizer = torch.optim.AdamW(model.parameters(), lr=5e-5)\n",
@@ -197,28 +214,35 @@
         "out_path = os.path.join(WEIGHTS_DIR, \"bert_standard_ssl_optimized.pth\")\n",
         "torch.save(model.state_dict(), out_path)\n",
         "print(f\"Weights saved to {out_path}\")"
-      ]
-    }
-  ],
-  "metadata": {
-    "kernelspec": {
-      "display_name": "Python 3",
-      "language": "python",
-      "name": "python3"
+    ]
+})
+
+nb = {
+    "cells": cells,
+    "metadata": {
+        "kernelspec": {
+            "display_name": "Python 3",
+            "language": "python",
+            "name": "python3"
+        },
+        "language_info": {
+            "codemirror_mode": {
+                "name": "ipython",
+                "version": 3
+            },
+            "file_extension": ".py",
+            "mimetype": "text/x-python",
+            "name": "python",
+            "nbconvert_exporter": "python",
+            "pygments_lexer": "ipython3",
+            "version": "3.8.10"
+        }
     },
-    "language_info": {
-      "codemirror_mode": {
-        "name": "ipython",
-        "version": 3
-      },
-      "file_extension": ".py",
-      "mimetype": "text/x-python",
-      "name": "python",
-      "nbconvert_exporter": "python",
-      "pygments_lexer": "ipython3",
-      "version": "3.8.10"
-    }
-  },
-  "nbformat": 4,
-  "nbformat_minor": 5
+    "nbformat": 4,
+    "nbformat_minor": 5
 }
+
+with open(NOTEBOOK_PATH, 'w') as f:
+    json.dump(nb, f, indent=2)
+
+print(f"Created {NOTEBOOK_PATH}")

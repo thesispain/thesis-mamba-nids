@@ -21,8 +21,10 @@
 > **Why?** XGBoost relies on *Statistical Features* (counts, rates, averages, time-windows). These features are aggregate properties that require a sufficient sample size to stabilize.
 > **The Consequence:** At 8 packets, statistical features are noisy and meaningless. XGBoost cannot see the *sequential conversation* (e.g., handshake anomalies). It *must* wait for the statistics to accrue (32 packets) to work.
 
-> **Critical Proof:** When forced to predict at Packet 8, XGBoost's Cross-DS AUC **collapses to 0.62**. It *cannot* detect early because the stats aren't ready.
-> **Solution:** Mamba sees the *sequence* immediately. It detects the attack pattern *within* the first 8 packets (0.76 AUC), without needing to wait for the statistics to stabilize.
+> **Critical Proof:** When forced to predict at Packet 8:
+> - **XGBoost Cross-DS AUC:** Collapses to **0.62**. Fails on Brute Force (Patator) with **0.57 AUC** (Random).
+> - **Mamba Cross-DS AUC:** Maintains **0.76**. Detects Brute Force with **0.94 AUC** (Excellent).
+> **Conclusion:** XGBoost needs 32 packets to count stats. Mamba sees the *sequence semantics* (e.g. handshake) immediately. This validates the "Semantic Superiority" argument.
 
 ---
 

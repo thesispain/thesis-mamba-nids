@@ -1,0 +1,82 @@
+[
+  {
+    "model": "BERT",
+    "f1": 0.0,
+    "auc": 0.6469,
+    "acc": 0.9426,
+    "prec": 0.0,
+    "rec": 0.0,
+    "latency_ms": 0.5062,
+    "throughput": 43101.0,
+    "mnp": 32.0,
+    "ttd_ms": 0.5062,
+    "cross_ds_auc": 0.694
+  },
+  {
+    "model": "BiMamba Teacher",
+    "f1": 0.892,
+    "auc": 0.9973,
+    "acc": 0.9866,
+    "prec": 0.8296,
+    "rec": 0.9645,
+    "latency_ms": 1.2306,
+    "throughput": 18174.0,
+    "mnp": 32.0,
+    "ttd_ms": 1.2306,
+    "cross_ds_auc": 0.7529
+  },
+  {
+    "model": "KD Student",
+    "f1": 0.1206,
+    "auc": 0.6487,
+    "acc": 0.4207,
+    "prec": 0.0661,
+    "rec": 0.6919,
+    "latency_ms": 12.7556,
+    "throughput": 11633.0,
+    "mnp": 23.799999237060547,
+    "ttd_ms": 9.4879,
+    "exit_distribution": {
+      "8": 29.366966247558594,
+      "16": 7.1851277351379395,
+      "32": 63.447906494140625
+    },
+    "cross_ds_auc": 0.6678
+  },
+  {
+    "model": "TED Student",
+    "f1": 0.0004,
+    "auc": 0.3171,
+    "acc": 0.9426,
+    "prec": 0.3333,
+    "rec": 0.0002,
+    "latency_ms": 1.1039,
+    "throughput": 16289.0,
+    "mnp": 8.0,
+    "ttd_ms": 0.2761,
+    "exit_distribution": {
+      "8": 99.95576477050781,
+      "16": 0.04303903132677078,
+      "32": 0.0011955286609008908
+    },
+    "cross_ds_auc": 0.5969
+  },
+  {
+    "model": "UniMamba (No KD)",
+    "f1": 0.8777,
+    "auc": 0.9952,
+    "acc": 0.9841,
+    "prec": 0.7869,
+    "rec": 0.9921,
+    "latency_ms": 2.2025,
+    "throughput": 16639.0,
+    "mnp": 32.0,
+    "ttd_ms": 2.2025,
+    "exit_distribution": {
+      "8": 0.0,
+      "16": 0.0,
+      "32": 100.0
+    },
+    "cross_ds_auc": 0.6527
+  }
+]

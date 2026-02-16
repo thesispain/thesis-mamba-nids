@@ -1,0 +1,337 @@
+
+import json
+import os
+
+NOTEBOOK_PATH = "Part3_Comprehensive_Evaluation.ipynb"
+
+cells = []
+
+# Cell 1: Imports
+cells.append({
+    "cell_type": "code",
+    "execution_count": None,
+    "metadata": {},
+    "outputs": [],
+    "source": [
+        "import os, sys, pickle, time, json\n",
+        "import numpy as np\n",
+        "import torch\n",
+        "import torch.nn as nn\n",
+        "import torch.nn.functional as F\n",
+        "from torch.utils.data import DataLoader, TensorDataset\n",
+        "from sklearn.model_selection import train_test_split\n",
+        "from sklearn.metrics import roc_auc_score, f1_score\n",
+        "from mamba_ssm import Mamba\n",
+        "import xgboost as xgb\n",
+        "\n",
+        "print(\"Imports successful.\")"
+    ]
+})
+
+# Cell 2: Config
+cells.append({
+    "cell_type": "code",
+    "execution_count": None,
+    "metadata": {},
+    "outputs": [],
+    "source": [
+        "DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')\n",
+        "W = \"weights\"\n",
+        "UNSW = \"../Organized_Final/data/unswnb15_full/finetune_mixed.pkl\"\n",
+        "CIC = \"data/cicids2017_flows.pkl\"\n",
+        "\n",
+        "print(f\"Device: {DEVICE}\")\n",
+        "print(f\"UNSW Path: {UNSW}\")\n",
+        "print(f\"CIC Path: {CIC}\")"
+    ]
+})
+
+# Cell 3: Model Definitions
+cells.append({
+    "cell_type": "code",
+    "execution_count": None,
+    "metadata": {},
+    "outputs": [],
+    "source": [
+        "# --- Model Architectures ---\n",
+        "class PacketEmbedder(nn.Module):\n",
+        "    def __init__(self, d_model=256):\n",
+        "        super().__init__()\n",
+        "        self.emb_proto = nn.Embedding(256, 32)\n",
+        "        self.emb_flags = nn.Embedding(64, 32)\n",
+        "        self.emb_dir   = nn.Embedding(2, 8)\n",
+        "        self.proj_len  = nn.Linear(1, 32)\n",
+        "        self.proj_iat  = nn.Linear(1, 32)\n",
+        "        self.fusion    = nn.Linear(136, d_model)\n",
+        "        self.norm      = nn.LayerNorm(d_model)\n",
+        "    def forward(self, x):\n",
+        "        proto  = x[:,:,0].long().clamp(0, 255)\n",
+        "        length = x[:,:,1:2]\n",
+        "        flags  = x[:,:,2].long().clamp(0, 63)\n",
+        "        iat    = x[:,:,3:4]\n",
+        "        direc  = x[:,:,4].long().clamp(0, 1)\n",
+        "        cat = torch.cat([self.emb_proto(proto), self.proj_len(length),\n",
+        "                         self.emb_flags(flags), self.proj_iat(iat),\n",
+        "                         self.emb_dir(direc)], dim=-1)\n",
+        "        return self.norm(self.fusion(cat))\n",
+        "\n",
+        "class BertEncoder(nn.Module):\n",
+        "    def __init__(self, d_model=256, nhead=8, num_layers=2):\n",
+        "        super().__init__()\n",
+        "        self.emb_proto = nn.Embedding(256, 16)\n",
+        "        self.emb_flags = nn.Embedding(64, 16)\n",
+        "        self.emb_dir   = nn.Embedding(2, 4)\n",
+        "        self.proj_len  = nn.Linear(1, 16)\n",
+        "        self.proj_iat  = nn.Linear(1, 16)\n",
+        "        self.fusion    = nn.Linear(68, d_model)\n",
+        "        self.norm      = nn.LayerNorm(d_model)\n",
+        "        encoder_layer = nn.TransformerEncoderLayer(d_model=d_model, nhead=nhead, dim_feedforward=1024, dropout=0.1, batch_first=True)\n",
+        "        self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)\n",
+        "        self.proj_head = nn.Sequential(nn.Linear(d_model, d_model), nn.ReLU(), nn.Linear(d_model, 128)) # 128 head\n",
+        "    def forward(self, x):\n",
+        "        proto  = x[:,:,0].long().clamp(0, 255)\n",
+        "        length = x[:,:,1:2]\n",
+        "        flags  = x[:,:,2].long().clamp(0, 63)\n",
+        "        iat    = x[:,:,3:4]\n",
+        "        direc  = x[:,:,4].long().clamp(0, 1)\n",
+        "        cat = torch.cat([self.emb_proto(proto), self.proj_len(length),\n",
+        "                         self.emb_flags(flags), self.proj_iat(iat),\n",
+        "                         self.emb_dir(direc)], dim=-1)\n",
+        "        feat = self.norm(self.fusion(cat))\n",
+        "        feat = self.transformer_encoder(feat)\n",
+        "        return self.proj_head(feat[:, 0, :]), None\n",
+        "\n",
+        "class BiMambaEncoder(nn.Module):\n",
+        "    def __init__(self, d_model=256):\n",
+        "        super().__init__()\n",
+        "        self.tokenizer = PacketEmbedder(d_model)\n",
+        "        self.layers = nn.ModuleList([Mamba(d_model=d_model, d_state=16, d_conv=4, expand=2) for _ in range(4)])\n",
+        "        self.layers_rev = nn.ModuleList([Mamba(d_model=d_model, d_state=16, d_conv=4, expand=2) for _ in range(4)])\n",
+        "        self.norm = nn.LayerNorm(d_model)\n",
+        "        self.proj_head = nn.Sequential(nn.Linear(d_model, d_model), nn.ReLU(), nn.Linear(d_model, 256))\n",
+        "    def forward(self, x):\n",
+        "        feat = self.tokenizer(x)\n",
+        "        for fwd, rev in zip(self.layers, self.layers_rev):\n",
+        "             out_f = fwd(feat)\n",
+        "             out_r = rev(feat.flip(1)).flip(1)\n",
+        "             feat = self.norm((out_f + out_r) / 2 + feat)\n",
+        "        return self.proj_head(feat.mean(1)), None\n",
+        "\n",
+        "class Classifier(nn.Module):\n",
+        "    def __init__(self, encoder, d_model=256):\n",
+        "        super().__init__()\n",
+        "        self.encoder = encoder\n",
+        "        self.head = nn.Sequential(nn.Linear(d_model, 64), nn.ReLU(), nn.Dropout(0.1), nn.Linear(64, 2))\n",
+        "    def forward(self, x):\n",
+        "        z = self.encoder(x)\n",
+        "        if isinstance(z, tuple): z = z[0]\n",
+        "        return self.head(z)\n",
+        "\n",
+        "class BlockwiseEarlyExitMamba(nn.Module):\n",
+        "    def __init__(self, d_model=256, exit_positions=None, conf_thresh=0.85):\n",
+        "        super().__init__()\n",
+        "        if exit_positions is None: exit_positions = [8, 16, 32]\n",
+        "        self.exit_positions = exit_positions\n",
+        "        self.n_exits = len(exit_positions)\n",
+        "        self.conf_thresh = conf_thresh\n",
+        "        self.tokenizer = PacketEmbedder(d_model)\n",
+        "        self.layers = nn.ModuleList([Mamba(d_model=d_model, d_state=16, d_conv=4, expand=2) for _ in range(4)])\n",
+        "        self.norm = nn.LayerNorm(d_model)\n",
+        "        self.exit_classifiers = nn.ModuleDict({\n",
+        "            str(p): nn.Sequential(nn.Linear(d_model, 128), nn.ReLU(), nn.Dropout(0.1), nn.Linear(128, 2)) for p in exit_positions})\n",
+        "        self.confidence_heads = nn.ModuleDict({\n",
+        "            str(p): nn.Sequential(nn.Linear(d_model + 2, 64), nn.ReLU(), nn.Linear(64, 1), nn.Sigmoid()) for p in exit_positions})\n",
+        "\n",
+        "    def _backbone(self, x):\n",
+        "        feat = self.tokenizer(x)\n",
+        "        for layer in self.layers:\n",
+        "            feat = self.norm(layer(feat) + feat)\n",
+        "        return feat\n",
+        "\n",
+        "    def forward_inference(self, x):\n",
+        "         # Standard Output (Last Layer) for Benchmark\n",
+        "         feat = self._backbone(x)\n",
+        "         last_pos = self.exit_positions[-1]\n",
+        "         idx = min(last_pos, feat.size(1)) - 1\n",
+        "         h = feat[:, idx, :]\n",
+        "         logits = self.exit_classifiers[str(last_pos)](h)\n",
+        "         return logits, None\n",
+        "\n",
+        "print(\"Models defined.\")"
+    ]
+})
+
+# Cell 4: Helpers
+cells.append({
+    "cell_type": "code",
+    "execution_count": None,
+    "metadata": {},
+    "outputs": [],
+    "source": [
+        "def train_xgboost(X, y, depth=32, name=\"Full\"):\n",
+        "    print(f\"Training XGBoost ({name})...\")\n",
+        "    X_flat = X.reshape(X.shape[0], 32, -1)[:, :depth, :].reshape(X.shape[0], -1)\n",
+        "    clf = xgb.XGBClassifier(n_estimators=100, max_depth=6, n_jobs=-1, device='cuda')\n",
+        "    clf.fit(X_flat, y)\n",
+        "    return clf\n",
+        "\n",
+        "def eval_per_class(true_y, pred_probs, attack_types, model_name):\n",
+        "    unique_types = np.unique(attack_types)\n",
+        "    targets = ['Benign', 'FTP-Patator', 'SSH-Patator', 'DoS Hulk', 'DoS GoldenEye', 'PortScan']\n",
+        "    benign_mask = (attack_types == 'Benign') \n",
+        "    benign_probs = pred_probs[benign_mask]\n",
+        "    print(f\"\\n--- {model_name} Breakdown ---\")\n",
+        "    print(f\"{'Attack Class':<25} |Count   | AUC (vs Benign)\")\n",
+        "    print(\"-\" * 50)\n",
+        "    for atk in targets:\n",
+        "        if atk not in unique_types: continue\n",
+        "        if atk == 'Benign': continue\n",
+        "        atk_mask = (attack_types == atk)\n",
+        "        atk_probs = pred_probs[atk_mask]\n",
+        "        combined_probs = np.concatenate([benign_probs, atk_probs])\n",
+        "        combined_y = np.concatenate([np.zeros(len(benign_probs)), np.ones(len(atk_probs))])\n",
+        "        try: auc = roc_auc_score(combined_y, combined_probs)\n",
+        "        except: auc = 0.5\n",
+        "        print(f\"{str(atk):<25} |{len(atk_probs):<8} | {auc:.4f}\")\n",
+        "\n",
+        "def eval_model(model, dl, name):\n",
+        "    model.eval()\n",
+        "    probs = []\n",
+        "    with torch.no_grad():\n",
+        "        for x, _ in dl:\n",
+        "            if hasattr(model, 'forward_inference'): logits, _ = model.forward_inference(x)\n",
+        "            else: logits = model(x)\n",
+        "            if isinstance(logits, tuple): logits = logits[0]\n",
+        "            probs.extend(F.softmax(logits, 1)[:, 1].cpu().numpy())\n",
+        "    probs = np.array(probs)\n",
+        "    return probs\n"
+    ]
+})
+
+# Cell 5: Data Loading
+cells.append({
+    "cell_type": "code",
+    "execution_count": None,
+    "metadata": {},
+    "outputs": [],
+    "source": [
+        "# Load Data\n",
+        "print(\"Loading UNSW (Train/Test In-Domain)...\")\n",
+        "with open(UNSW, 'rb') as f: unsw_data = pickle.load(f)\n",
+        "np.random.seed(42)\n",
+        "np.random.shuffle(unsw_data)\n",
+        "unsw_sub = unsw_data[:200000]\n",
+        "unsw_train = unsw_sub[:100000]\n",
+        "unsw_test  = unsw_sub[100000:]\n",
+        "X_unsw_train = np.array([d['features'] for d in unsw_train], dtype=np.float32)\n",
+        "y_unsw_train = np.array([d['label'] for d in unsw_train], dtype=np.int64)\n",
+        "X_unsw_test  = np.array([d['features'] for d in unsw_test], dtype=np.float32)\n",
+        "y_unsw_test  = np.array([d['label'] for d in unsw_test], dtype=np.int64)\n",
+        "\n",
+        "print(\"Loading CIC-IDS (Zero-Day Test)...\")\n",
+        "with open(CIC, 'rb') as f: cic_data = pickle.load(f)\n",
+        "np.random.shuffle(cic_data)\n",
+        "cic_sub = cic_data[:200000]\n",
+        "X_cic_test  = np.array([d['features'] for d in cic_sub], dtype=np.float32)\n",
+        "y_cic_test  = np.array([d['label'] for d in cic_sub], dtype=np.int64)\n",
+        "cats_cic_test = np.array([d.get('attack_type', 'Unknown') for d in cic_sub])\n",
+        "\n",
+        "# Prepare DataLoaders\n",
+        "unsw_dl = DataLoader(TensorDataset(torch.from_numpy(X_unsw_test).to(DEVICE), torch.from_numpy(y_unsw_test).to(DEVICE)), batch_size=512)\n",
+        "cic_dl  = DataLoader(TensorDataset(torch.from_numpy(X_cic_test).to(DEVICE), torch.from_numpy(y_cic_test).to(DEVICE)), batch_size=512)\n",
+        "print(\"Data Loaded.\")"
+    ]
+})
+
+# Cell 6: XGBoost Evaluation
+cells.append({
+    "cell_type": "code",
+    "execution_count": None,
+    "metadata": {},
+    "outputs": [],
+    "source": [
+        "# XGBoost Evaluation\n",
+        "xgb_unsw = train_xgboost(X_unsw_train, y_unsw_train, 32, \"In-Domain UNSW\")\n",
+        "y_prob_unsw = xgb_unsw.predict_proba(X_unsw_test.reshape(X_unsw_test.shape[0], -1))[:, 1]\n",
+        "print(f\"XGBoost In-Domain AUC: {roc_auc_score(y_unsw_test, y_prob_unsw):.4f}\")\n",
+        "\n",
+        "y_prob_zero = xgb_unsw.predict_proba(X_cic_test.reshape(X_cic_test.shape[0], -1))[:, 1]\n",
+        "print(f\"XGBoost Zero-Day AUC: {roc_auc_score(y_cic_test, y_prob_zero):.4f}\")\n",
+        "eval_per_class(y_cic_test, y_prob_zero, cats_cic_test, \"XGBoost Zero-Day\")\n",
+        "\n",
+        "# XGBoost 8-Packet\n",
+        "xgb_unsw_8 = train_xgboost(X_unsw_train, y_unsw_train, 8, \"In-Domain UNSW 8\")\n",
+        "X_cic_test_8 = X_cic_test.reshape(X_cic_test.shape[0], 32, -1)[:, :8, :].reshape(X_cic_test.shape[0], -1)\n",
+        "y_prob_8 = xgb_unsw_8.predict_proba(X_cic_test_8)[:, 1]\n",
+        "print(f\"XGBoost Zero-Day (8-Pkt) AUC: {roc_auc_score(y_cic_test, y_prob_8):.4f}\")\n",
+        "eval_per_class(y_cic_test, y_prob_8, cats_cic_test, \"XGBoost Zero-Day (8-Pkt)\")"
+    ]
+})
+
+# Cell 7: Deep Learning Evaluation
+cells.append({
+    "cell_type": "code",
+    "execution_count": None,
+    "metadata": {},
+    "outputs": [],
+    "source": [
+        "results = {}\n",
+        "\n",
+        "# BiMamba\n",
+        "enc = BiMambaEncoder()\n",
+        "bimamba = Classifier(enc).to(DEVICE)\n",
+        "sd = torch.load(f\"{W}/teachers/teacher_bimamba_retrained.pth\", map_location=DEVICE, weights_only=False)\n",
+        "bimamba.load_state_dict(sd, strict=False)\n",
+        "results['BiMamba'] = {'In': roc_auc_score(y_unsw_test, eval_model(bimamba, unsw_dl, \"BiMamba\")),\n",
+        "                      'Zero': roc_auc_score(y_cic_test, eval_model(bimamba, cic_dl, \"BiMamba\"))}\n",
+        "print(f\"BiMamba: {results['BiMamba']}\")\n",
+        "\n",
+        "# TED\n",
+        "ted = BlockwiseEarlyExitMamba(conf_thresh=0.85).to(DEVICE)\n",
+        "sd = torch.load(f\"{W}/students/student_ted.pth\", map_location=DEVICE, weights_only=False)\n",
+        "ted.load_state_dict(sd, strict=False)\n",
+        "results['TED'] = {'In': roc_auc_score(y_unsw_test, eval_model(ted, unsw_dl, \"TED\")),\n",
+        "                  'Zero': roc_auc_score(y_cic_test, eval_model(ted, cic_dl, \"TED\"))}\n",
+        "print(f\"TED: {results['TED']}\")\n",
+        "eval_per_class(y_cic_test, eval_model(ted, cic_dl, \"TED\"), cats_cic_test, \"TED\")\n",
+        "\n",
+        "# BERT\n",
+        "bert_enc = BertEncoder()\n",
+        "bert = Classifier(bert_enc, d_model=128).to(DEVICE)\n",
+        "sd = torch.load(f\"{W}/teachers/teacher_bert_masking.pth\", map_location=DEVICE, weights_only=False)\n",
+        "bert.load_state_dict(sd, strict=False)\n",
+        "results['BERT'] = {'In': roc_auc_score(y_unsw_test, eval_model(bert, unsw_dl, \"BERT\")),\n",
+        "                   'Zero': roc_auc_score(y_cic_test, eval_model(bert, cic_dl, \"BERT\"))}\n",
+        "print(f\"BERT: {results['BERT']}\")"
+    ]
+})
+
+nb = {
+    "cells": cells,
+    "metadata": {
+        "kernelspec": {
+            "display_name": "Python 3",
+            "language": "python",
+            "name": "python3"
+        },
+        "language_info": {
+            "codemirror_mode": {
+                "name": "ipython",
+                "version": 3
+            },
+            "file_extension": ".py",
+            "mimetype": "text/x-python",
+            "name": "python",
+            "nbconvert_exporter": "python",
+            "pygments_lexer": "ipython3",
+            "version": "3.8.10"
+        }
+    },
+    "nbformat": 4,
+    "nbformat_minor": 5
+}
+
+with open(NOTEBOOK_PATH, 'w') as f:
+    json.dump(nb, f, indent=2)
+
+print(f"Created {NOTEBOOK_PATH}")
