@@ -32,7 +32,7 @@ This thesis presents a systematic evolution from traditional Machine Learning (X
 2. **BERT + SSL:** Solves generalization via self-supervised learning, but $O(N^2)$ complexity → slow.
 3. **UniMamba:** Replaces Attention with SSM. Almost matches BERT accuracy, 30% faster.
 4. **BiMamba (Oracle Teacher):** Bidirectional Mamba. Best accuracy (0.89 F1) but too slow to deploy.
-5. **KD Student:** Distills Teacher knowledge into fast UniMamba. Matches accuracy at full speed.
+5. **KD Student:** Distills Teacher's SSL knowledge into UniMamba. Matches accuracy and **improves zero-shot generalization to 0.84 F1**.
 6. **Dynamic TED:** Adds early exit, but per-packet GPU↔CPU switching creates overhead.
 7. **Blockwise TED (Final):** Checks at Packet 8/16/32. 95% of flows exit at Packet 8. **3.5x less compute.**
 
@@ -241,7 +241,7 @@ We apply **Soft Knowledge Distillation** to transfer the BiMamba Teacher's knowl
 - **AUC improved** to 0.9959 (nearly matches the Teacher's 0.9975) → better probability calibration.
 - **Cross-DS Adaptation improved** from 0.8663 → 0.8710.
 - **Zero-Shot Generalization (Optimal F1) improved** from 0.79 (UniMamba) → **0.84 (KD Student)**.
-  - This proves that **Distillation Works**: The Student learned generalizable features from the Teacher (BiMamba), avoiding the Teacher's own overfitting (BiMamba Zero-Shot was only 0.60).
+  - This is the **Final Verdict on SSL**: While the Supervised UniMamba is decent (0.79) due to small-data regularization, the **SSL-Distilled Student is superior (0.84)**. The Student successfully extracts the Teacher's general knowledge while discarding its overfitting.
 - **Latency: unchanged** (0.74ms ≈ 0.72ms, within noise).
 - **Problem:** The student still processes all **32 packets**. For obvious attacks (e.g., DoS floods), 8 packets are enough.
 
