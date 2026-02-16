@@ -239,7 +239,9 @@ We apply **Soft Knowledge Distillation** to transfer the BiMamba Teacher's knowl
 
 ### 6.2 Analysis
 - **AUC improved** to 0.9959 (nearly matches the Teacher's 0.9975) → better probability calibration.
-- **Cross-DS F1 improved** from 0.8663 → 0.8710 → Teacher knowledge helps generalization.
+- **Cross-DS Adaptation improved** from 0.8663 → 0.8710.
+- **Zero-Shot Generalization (Optimal F1) improved** from 0.79 (UniMamba) → **0.84 (KD Student)**.
+  - This proves that **Distillation Works**: The Student learned generalizable features from the Teacher (BiMamba), avoiding the Teacher's own overfitting (BiMamba Zero-Shot was only 0.60).
 - **Latency: unchanged** (0.74ms ≈ 0.72ms, within noise).
 - **Problem:** The student still processes all **32 packets**. For obvious attacks (e.g., DoS floods), 8 packets are enough.
 
