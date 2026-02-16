@@ -86,13 +86,20 @@ XGBoost operates on **tabular data** — it cannot process raw packet sequences.
 ### 2.3 The Fatal Flaw: Zero Generalization
 We trained XGBoost on UNSW-NB15 and tested on CIC-IDS-2017 (Zero-Shot):
 
-| Dataset | F1 Score | AUC | Accuracy |
+| Dataset | F1 Score | **Attack Recall** | Accuracy |
 |:--|:--|:--|:--|
-| **UNSW (In-Domain)** | **0.8845** | **0.9977** | **0.9852** |
-| **CIC-IDS (Cross-Dataset)** | **0.7195** | **0.8776** | **0.8778** |
-| **Drop** | **-16.5%** | **-12.0%** | **-10.7%** |
+| **UNSW (In-Domain)** | **0.8845** | **95.2%** | **98.5%** |
+| **CIC-IDS (Cross-Dataset)** | **0.7195** | **65.3%** | 87.8% |
+| **Drop** | **-16.5%** | **-29.9%** | -10.7% |
 
-> **Critical Finding:** XGBoost memorizes dataset-specific feature distributions (e.g., exact packet lengths, specific flag combinations). When the distribution changes (different network, different attack tools), performance collapses. XGBoost **cannot learn transferable representations** — it simply finds optimal decision boundaries for a fixed feature space.
+**The Class Imbalance Trap:**
+- CIC-IDS is **81.3% benign** traffic.
+- XGBoost achieves 87.8% accuracy simply by predicting "benign" most of the time.
+- But **34.7% of attacks go undetected** (Recall drops from 95% → 65%)!
+
+> **Critical Finding:** XGBoost memorizes dataset-specific attack signatures (e.g., exact packet lengths in UNSW attacks vs. CIC-IDS attacks). When attack tools change, the model **fails to detect new attack variants**. This is catastrophic for production NIDS — **missing 1 in 3 attacks is unacceptable**.
+
+**Comparison to Literature:** Supervised models exhibit similar cross-dataset failures (DNN: 60% accuracy, XGBoost: 72% F1). XGBoost **cannot learn transferable representations** — it finds optimal thresholds for fixed features, not attack *behavior*.
 
 ![Cross-Dataset Generalization Gap](../plots/02_cross_dataset_gap.png)
 
