@@ -308,7 +308,7 @@ def main():
     X_test = np.array([d['features'] for d in test_data], dtype=np.float32)
     y_test = np.array([d['label'] for d in test_data], dtype=np.longlong)
     test_dl = DataLoader(TensorDataset(torch.from_numpy(X_test), torch.from_numpy(y_test)),
-                         batch_size=32, shuffle=False)
+                         batch_size=512, shuffle=False)
     benign = np.sum(y_test == 0); attack = np.sum(y_test == 1)
     print(f"  UNSW Test: {len(y_test):,} (Benign: {benign:,}, Attack: {attack:,})")
 
@@ -319,7 +319,7 @@ def main():
     X_cic = np.array([d['features'] for d in cic_data], dtype=np.float32)
     y_cic = np.array([d['label'] for d in cic_data], dtype=np.longlong)
     cic_dl = DataLoader(TensorDataset(torch.from_numpy(X_cic), torch.from_numpy(y_cic)),
-                        batch_size=32, shuffle=False)
+                        batch_size=512, shuffle=False)
     print(f"  CIC-IDS: {len(y_cic):,}")
 
     results = []
