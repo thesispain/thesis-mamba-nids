@@ -59,17 +59,15 @@ UNSW = "data/unsw_finetune_mixed.pkl"  # <--- Change this to match where you put
 
 ### 1️⃣ Train BERT (Recommended)
 Since the current BERT weights are SSL-only (no classifier head), best performance comes from training fresh.
-1. Open `Part1_SSL_Pretraining.ipynb`.
-2. Update the Data Path (`DATA_FILE`).
-3. Run All Cells.
-4. This will create optimal weights at `weights/ssl/bert_standard_ssl_optimized.pth`.
+1. Run `python code/01_train_ssl_bert.py` (Or notebook).
+2. This will create optimal weights at `weights/ssl/bert_standard_ssl_optimized.pth`.
 
 ### 2️⃣ Evaluate All Models
-1. Open `Part3_Comprehensive_Evaluation.ipynb`.
-2. Update the Data Paths (`UNSW`, `CIC`).
-3. (Optional) Update the BERT weight path to point to your *newly trained* weights from Step 1 (`weights/ssl/bert_standard_ssl_optimized.pth`).
-4. Run All Cells.
-5. You should see:
-   - **BiMamba**: ~0.99 (In) / ~0.76 (Zero)
-   - **BERT**: ~0.84+ (Zero) [If using trained weights]
-   - **TED**: ~0.95+ (Efficiency)
+1. Run `python code/03_evaluate_all.py` (Or notebook).
+2. You should see results printed.
+
+### 🚀 Run Everything (One Command)
+```bash
+bash run_all.sh
+```
+This runs Pretraining + Evaluation sequentially.
