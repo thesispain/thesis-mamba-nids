@@ -34,7 +34,7 @@ print(f"CIC Path: {CIC}")
 # In[ ]:
 
 
-# --- Model Architectures ---
+# --- Standard Packet Embedder (For BiMamba / TED) ---
 class PacketEmbedder(nn.Module):
     def __init__(self, d_model=256):
         super().__init__()
@@ -56,32 +56,44 @@ class PacketEmbedder(nn.Module):
                          self.emb_dir(direc)], dim=-1)
         return self.norm(self.fusion(cat))
 
-class BertEncoder(nn.Module):
-    def __init__(self, d_model=256, nhead=8, num_layers=2):
+# --- BERT Packet Embedder (Matching bert_cutmix_v5_partial.pth) ---
+class PacketEmbedderBert(nn.Module):
+    def __init__(self, d_model=256):
         super().__init__()
-        self.emb_proto = nn.Embedding(256, 16)
-        self.emb_flags = nn.Embedding(64, 16)
-        self.emb_dir   = nn.Embedding(2, 4)
-        self.proj_len  = nn.Linear(1, 16)
-        self.proj_iat  = nn.Linear(1, 16)
-        self.fusion    = nn.Linear(68, d_model)
+        self.proto_emb = nn.Embedding(256, 32)
+        self.flags_emb = nn.Embedding(64, 32)
+        self.dir_emb   = nn.Embedding(2, 8)
+        self.loglen_proj = nn.Linear(1, 32)
+        self.iat_proj  = nn.Linear(1, 32)
+        self.fusion    = nn.Linear(136, d_model)
         self.norm      = nn.LayerNorm(d_model)
-        encoder_layer = nn.TransformerEncoderLayer(d_model=d_model, nhead=nhead, dim_feedforward=1024, dropout=0.1, batch_first=True)
-        self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
-        self.proj_head = nn.Sequential(nn.Linear(d_model, d_model), nn.ReLU(), nn.Linear(d_model, 128)) # 128 head
     def forward(self, x):
         proto  = x[:,:,0].long().clamp(0, 255)
         length = x[:,:,1:2]
         flags  = x[:,:,2].long().clamp(0, 63)
         iat    = x[:,:,3:4]
         direc  = x[:,:,4].long().clamp(0, 1)
-        cat = torch.cat([self.emb_proto(proto), self.proj_len(length),
-                         self.emb_flags(flags), self.proj_iat(iat),
-                         self.emb_dir(direc)], dim=-1)
-        feat = self.norm(self.fusion(cat))
-        feat = self.transformer_encoder(feat)
-        return self.proj_head(feat[:, 0, :]), None
+        cat = torch.cat([self.proto_emb(proto), self.loglen_proj(length),
+                         self.flags_emb(flags), self.iat_proj(iat),
+                         self.dir_emb(direc)], dim=-1)
+        return self.norm(self.fusion(cat))
 
+# --- BERT Wrapper (Matching bert_cutmix_v5_partial.pth) ---
+class BertWrapper(nn.Module):
+    def __init__(self, d_model=256, nhead=8):
+        super().__init__()
+        self.embedder = PacketEmbedderBert(d_model)
+        encoder_layer = nn.TransformerEncoderLayer(d_model=d_model, nhead=nhead, dim_feedforward=1024, dropout=0.1, batch_first=True)
+        self.transformer = nn.TransformerEncoder(encoder_layer, num_layers=4)
+        self.proj = nn.Linear(d_model, 128)
+        self.recon_head = nn.Linear(d_model, 5) # Matches checkpoint [5, 256]
+    def forward(self, x):
+        feat = self.embedder(x)
+        feat = self.transformer(feat)
+        # CLS Pooling (Index 0)
+        return self.proj(feat[:, 0, :]), None
+
+# --- BiMamba ---
 class BiMambaEncoder(nn.Module):
     def __init__(self, d_model=256):
         super().__init__()
@@ -256,11 +268,13 @@ results['TED'] = {'In': roc_auc_score(y_unsw_test, eval_model(ted, unsw_dl, "TED
 print(f"TED: {results['TED']}")
 eval_per_class(y_cic_test, eval_model(ted, cic_dl, "TED"), cats_cic_test, "TED")
 
-# BERT
-bert_enc = BertEncoder()
+# BERT (Using CLS weights which are named 'bert_cutmix_v5_partial.pth')
+# Using BertWrapper which matches the keys of that file.
+bert_enc = BertWrapper(d_model=256, nhead=8)
 bert = Classifier(bert_enc, d_model=128).to(DEVICE)
-sd = torch.load(f"{W}/teachers/teacher_bert_masking.pth", map_location=DEVICE, weights_only=False)
-bert.load_state_dict(sd, strict=False)
+sd = torch.load(f"{W}/ssl/bert_cutmix_v5_partial.pth", map_location=DEVICE, weights_only=False)
+bert.encoder.load_state_dict(sd, strict=False)
+
 results['BERT'] = {'In': roc_auc_score(y_unsw_test, eval_model(bert, unsw_dl, "BERT")),
                    'Zero': roc_auc_score(y_cic_test, eval_model(bert, cic_dl, "BERT"))}
 print(f"BERT: {results['BERT']}")
