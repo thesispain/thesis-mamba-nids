@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
 
 import os, sys, pickle, time, json
 import numpy as np
@@ -17,10 +12,6 @@ import xgboost as xgb
 
 print("Imports successful.")
 
-
-# In[ ]:
-
-
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 W = "weights"
 UNSW = "../Organized_Final/data/unswnb15_full/finetune_mixed.pkl"
@@ -30,11 +21,7 @@ print(f"Device: {DEVICE}")
 print(f"UNSW Path: {UNSW}")
 print(f"CIC Path: {CIC}")
 
-
-# In[ ]:
-
-
-# --- Standard Packet Embedder (For BiMamba / TED) ---
+# --- Standard Packet Embedder (For BiMamba / TED / Standard BERT) ---
 class PacketEmbedder(nn.Module):
     def __init__(self, d_model=256):
         super().__init__()
@@ -56,7 +43,34 @@ class PacketEmbedder(nn.Module):
                          self.emb_dir(direc)], dim=-1)
         return self.norm(self.fusion(cat))
 
-# --- BERT Packet Embedder (Matching bert_cutmix_v5_partial.pth) ---
+# --- Standard BERT Encoder (Matches Part 1 Training) ---
+class BertEncoder(nn.Module):
+    def __init__(self, d_model=256, nhead=8, num_layers=2):
+        super().__init__()
+        self.emb_proto = nn.Embedding(256, 16)
+        self.emb_flags = nn.Embedding(64, 16)
+        self.emb_dir   = nn.Embedding(2, 4)
+        self.proj_len  = nn.Linear(1, 16)
+        self.proj_iat  = nn.Linear(1, 16)
+        self.fusion    = nn.Linear(68, d_model)
+        self.norm      = nn.LayerNorm(d_model)
+        encoder_layer = nn.TransformerEncoderLayer(d_model=d_model, nhead=nhead, dim_feedforward=1024, dropout=0.1, batch_first=True)
+        self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
+        self.proj_head = nn.Sequential(nn.Linear(d_model, d_model), nn.ReLU(), nn.Linear(d_model, 128))
+    def forward(self, x):
+        proto  = x[:,:,0].long().clamp(0, 255)
+        length = x[:,:,1:2]
+        flags  = x[:,:,2].long().clamp(0, 63)
+        iat    = x[:,:,3:4]
+        direc  = x[:,:,4].long().clamp(0, 1)
+        cat = torch.cat([self.emb_proto(proto), self.proj_len(length),
+                         self.emb_flags(flags), self.proj_iat(iat),
+                         self.emb_dir(direc)], dim=-1)
+        feat = self.norm(self.fusion(cat))
+        feat = self.transformer_encoder(feat)
+        return self.proj_head(feat[:, 0, :]), None
+
+# --- Custom BERT Packet Embedder (Matches bert_cutmix_v5_partial.pth) ---
 class PacketEmbedderBert(nn.Module):
     def __init__(self, d_model=256):
         super().__init__()
@@ -78,7 +92,7 @@ class PacketEmbedderBert(nn.Module):
                          self.dir_emb(direc)], dim=-1)
         return self.norm(self.fusion(cat))
 
-# --- BERT Wrapper (Matching bert_cutmix_v5_partial.pth) ---
+# --- Custom BERT Wrapper (Matches bert_cutmix_v5_partial.pth) ---
 class BertWrapper(nn.Module):
     def __init__(self, d_model=256, nhead=8):
         super().__init__()
@@ -90,14 +104,13 @@ class BertWrapper(nn.Module):
     def forward(self, x):
         feat = self.embedder(x)
         feat = self.transformer(feat)
-        # CLS Pooling (Index 0)
         return self.proj(feat[:, 0, :]), None
 
 # --- BiMamba ---
 class BiMambaEncoder(nn.Module):
     def __init__(self, d_model=256):
         super().__init__()
-        self.tokenizer = PacketEmbedder(d_model)
+        self.tokenizer = PacketEmbedder(d_model) # Standard
         self.layers = nn.ModuleList([Mamba(d_model=d_model, d_state=16, d_conv=4, expand=2) for _ in range(4)])
         self.layers_rev = nn.ModuleList([Mamba(d_model=d_model, d_state=16, d_conv=4, expand=2) for _ in range(4)])
         self.norm = nn.LayerNorm(d_model)
@@ -127,34 +140,26 @@ class BlockwiseEarlyExitMamba(nn.Module):
         self.exit_positions = exit_positions
         self.n_exits = len(exit_positions)
         self.conf_thresh = conf_thresh
-        self.tokenizer = PacketEmbedder(d_model)
+        self.tokenizer = PacketEmbedder(d_model) # Standard
         self.layers = nn.ModuleList([Mamba(d_model=d_model, d_state=16, d_conv=4, expand=2) for _ in range(4)])
         self.norm = nn.LayerNorm(d_model)
         self.exit_classifiers = nn.ModuleDict({
             str(p): nn.Sequential(nn.Linear(d_model, 128), nn.ReLU(), nn.Dropout(0.1), nn.Linear(128, 2)) for p in exit_positions})
         self.confidence_heads = nn.ModuleDict({
             str(p): nn.Sequential(nn.Linear(d_model + 2, 64), nn.ReLU(), nn.Linear(64, 1), nn.Sigmoid()) for p in exit_positions})
-
     def _backbone(self, x):
         feat = self.tokenizer(x)
         for layer in self.layers:
             feat = self.norm(layer(feat) + feat)
         return feat
-
     def forward_inference(self, x):
-         # Standard Output (Last Layer) for Benchmark
          feat = self._backbone(x)
          last_pos = self.exit_positions[-1]
          idx = min(last_pos, feat.size(1)) - 1
-         h = feat[:, idx, :]
-         logits = self.exit_classifiers[str(last_pos)](h)
+         h = feat[:, idx, :]\n         logits = self.exit_classifiers[str(last_pos)](h)
          return logits, None
 
 print("Models defined.")
-
-
-# In[ ]:
-
 
 def train_xgboost(X, y, depth=32, name="Full"):
     print(f"Training XGBoost ({name})...")
@@ -168,8 +173,8 @@ def eval_per_class(true_y, pred_probs, attack_types, model_name):
     targets = ['Benign', 'FTP-Patator', 'SSH-Patator', 'DoS Hulk', 'DoS GoldenEye', 'PortScan']
     benign_mask = (attack_types == 'Benign') 
     benign_probs = pred_probs[benign_mask]
-    print(f"\n--- {model_name} Breakdown ---")
-    print(f"{'Attack Class':<25} |Count   | AUC (vs Benign)")
+    print(f"\\n--- {model_name} Breakdown ---\")
+    print(f"{'Attack Class':<25} |Count   | AUC (vs Benign)\")
     print("-" * 50)
     for atk in targets:
         if atk not in unique_types: continue
@@ -194,10 +199,6 @@ def eval_model(model, dl, name):
     probs = np.array(probs)
     return probs
 
-
-# In[ ]:
-
-
 # Load Data
 print("Loading UNSW (Train/Test In-Domain)...")
 with open(UNSW, 'rb') as f: unsw_data = pickle.load(f)
@@ -219,14 +220,9 @@ X_cic_test  = np.array([d['features'] for d in cic_sub], dtype=np.float32)
 y_cic_test  = np.array([d['label'] for d in cic_sub], dtype=np.int64)
 cats_cic_test = np.array([d.get('attack_type', 'Unknown') for d in cic_sub])
 
-# Prepare DataLoaders
 unsw_dl = DataLoader(TensorDataset(torch.from_numpy(X_unsw_test).to(DEVICE), torch.from_numpy(y_unsw_test).to(DEVICE)), batch_size=512)
 cic_dl  = DataLoader(TensorDataset(torch.from_numpy(X_cic_test).to(DEVICE), torch.from_numpy(y_cic_test).to(DEVICE)), batch_size=512)
 print("Data Loaded.")
-
-
-# In[ ]:
-
 
 # XGBoost Evaluation
 xgb_unsw = train_xgboost(X_unsw_train, y_unsw_train, 32, "In-Domain UNSW")
@@ -237,17 +233,7 @@ y_prob_zero = xgb_unsw.predict_proba(X_cic_test.reshape(X_cic_test.shape[0], -1)
 print(f"XGBoost Zero-Day AUC: {roc_auc_score(y_cic_test, y_prob_zero):.4f}")
 eval_per_class(y_cic_test, y_prob_zero, cats_cic_test, "XGBoost Zero-Day")
 
-# XGBoost 8-Packet
-xgb_unsw_8 = train_xgboost(X_unsw_train, y_unsw_train, 8, "In-Domain UNSW 8")
-X_cic_test_8 = X_cic_test.reshape(X_cic_test.shape[0], 32, -1)[:, :8, :].reshape(X_cic_test.shape[0], -1)
-y_prob_8 = xgb_unsw_8.predict_proba(X_cic_test_8)[:, 1]
-print(f"XGBoost Zero-Day (8-Pkt) AUC: {roc_auc_score(y_cic_test, y_prob_8):.4f}")
-eval_per_class(y_cic_test, y_prob_8, cats_cic_test, "XGBoost Zero-Day (8-Pkt)")
-
-
-# In[ ]:
-
-
+# RESULTS
 results = {}
 
 # BiMamba
@@ -268,14 +254,21 @@ results['TED'] = {'In': roc_auc_score(y_unsw_test, eval_model(ted, unsw_dl, "TED
 print(f"TED: {results['TED']}")
 eval_per_class(y_cic_test, eval_model(ted, cic_dl, "TED"), cats_cic_test, "TED")
 
-# BERT (Using CLS weights which are named 'bert_cutmix_v5_partial.pth')
-# Using BertWrapper which matches the keys of that file.
-bert_enc = BertWrapper(d_model=256, nhead=8)
-bert = Classifier(bert_enc, d_model=128).to(DEVICE)
-sd = torch.load(f"{W}/ssl/bert_cutmix_v5_partial.pth", map_location=DEVICE, weights_only=False)
-bert.encoder.load_state_dict(sd, strict=False)
+# BERT
+# Check for optimized weights first
+if os.path.exists(f"{W}/ssl/bert_standard_ssl_optimized.pth"):
+    print(f"Loading Optimized Weights: {W}/ssl/bert_standard_ssl_optimized.pth")
+    bert_enc = BertEncoder(d_model=256, nhead=8) # Standard Class
+    bert = Classifier(bert_enc, d_model=128).to(DEVICE)
+    sd = torch.load(f"{W}/ssl/bert_standard_ssl_optimized.pth", map_location=DEVICE, weights_only=False)
+    bert.encoder.load_state_dict(sd, strict=False)
+else:
+    print(f"Loading Checkpoint Weights: {W}/ssl/bert_cutmix_v5_partial.pth")
+    bert_enc = BertWrapper(d_model=256, nhead=8) # Custom Class
+    bert = Classifier(bert_enc, d_model=128).to(DEVICE)
+    sd = torch.load(f"{W}/ssl/bert_cutmix_v5_partial.pth", map_location=DEVICE, weights_only=False)
+    bert.encoder.load_state_dict(sd, strict=False)
 
 results['BERT'] = {'In': roc_auc_score(y_unsw_test, eval_model(bert, unsw_dl, "BERT")),
                    'Zero': roc_auc_score(y_cic_test, eval_model(bert, cic_dl, "BERT"))}
 print(f"BERT: {results['BERT']}")
-
