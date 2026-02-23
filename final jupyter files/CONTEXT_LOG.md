@@ -185,7 +185,60 @@ The v4 script Phase 3 confirmed BERT CTU=0.3893 (existing loaded weights), not 0
 - Centroids recomputed AFTER self-distill (reps may shift)
 - `max(auc, 1-auc)` for cross-dataset polarity invariance
 
-#### Status: NOT YET RUN. Script written, awaiting execution.
+#### Status: COMPLETED SUCCESSFULLY
+
+---
+
+### Session 4 (Feb 22–23 2026) — Self-Distillation Results
+
+#### Execution Summary
+- SSL pretrain: loaded existing weights from `weights/self_distill/unimamba_ssl.pth` (1 epoch, 190.8s)
+- Centroids computed: benign norm=10.79, attack norm=10.96
+- Self-distillation: 5 epochs (~4 min each), best val@8 AUC=0.8741 at epoch 2
+  - Epoch log: Ep1=0.7614, Ep2=0.8741★, Ep3=0.7684, Ep4=0.7405, Ep5=0.7326
+- Post-distill centroids shifted: benign=6.75, attack=15.32 (classes pushed apart)
+- All 8 JSON result files saved to `results/self_distill/`
+
+#### Self-Distill Centroid Classification (post self-distill)
+| Dataset | Exit 8 | Exit 16 | Exit 32 |
+|---------|--------|---------|---------|
+| UNSW    | 0.9360 | 0.8895  | 0.8705  |
+| CIC     | 0.6495 | 0.6174  | 0.5624  |
+
+#### Self-Distill k-NN(k=10) — comparable with BERT/BiMamba SSL
+| Dataset | Exit 8 | Exit 32 |
+|---------|--------|---------|
+| UNSW    | 0.9842 | 0.9706  |
+| CIC     | 0.5927 | 0.5619  |
+
+#### Comparison: SSL k-NN across models (UNSW / CIC)
+| Model              | UNSW   | CIC    |
+|---------------------|--------|--------|
+| BiMamba SSL (k-NN)  | 0.9673 | 0.8958 |
+| BERT SSL (k-NN)     | 0.9690 | 0.5537 |
+| UniMamba SD (k-NN@8) | 0.9842 | 0.5927 |
+| UniMamba SD (centroid@8) | 0.9360 | 0.6495 |
+
+#### Self-Distill Improvement (AUC Δ vs SSL baseline)
+| Dataset | Before | After | Δ       |
+|---------|--------|-------|---------|
+| UNSW @8 | 0.6900 | 0.9360 | +0.2460 |
+| CIC @8  | 0.8019 | 0.6495 | −0.1524 |
+
+#### Latency
+- UniMamba SSL: **0.6533ms** (B=1)
+- Compare: BERT 0.50ms, BiMamba 1.26ms
+
+#### Output Files
+- `results/self_distill/` — 8 JSON files (step1–step6 + summary)
+- `weights/self_distill/unimamba_ssl.pth` (7.6 MB)
+- `weights/self_distill/unimamba_selfdist.pth` (7.6 MB)
+
+#### Key Observations
+1. **UNSW self-distill is outstanding**: centroid@8 = 0.9360, k-NN@8 = 0.9842 (beats both teachers)
+2. **CIC regressed with self-distill** (centroid: 0.8019→0.6495) — self-distill sharpened UNSW boundary at CIC's expense
+3. **Early exit works**: Exit@8 consistently outperforms Exit@32 — self-distill successfully taught early layers
+4. **Centroid shift proves it worked**: benign centroid shrank (10.79→6.75), attack expanded (10.96→15.32)
 
 ---
 *Append below this line for new sessions*
