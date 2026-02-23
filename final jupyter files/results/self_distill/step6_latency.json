@@ -1,0 +1,11 @@
+{
+  "step": "Step 6 \u2014 Latency Benchmark",
+  "timestamp": "20260223_130341",
+  "results": {
+    "model": "UniMamba Self-Distill",
+    "batch_size": 1,
+    "latency_ms": 0.6533,
+    "gpu": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "note": "centroid cosine distance adds negligible overhead"
+  }
+}

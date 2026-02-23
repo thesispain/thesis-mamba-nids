@@ -1,0 +1,70 @@
+{
+  "step": "Step 4 \u2014 Post Self-Distillation Centroid Classification",
+  "method": "centroid_distance",
+  "timestamp": "20260223_130341",
+  "results": [
+    {
+      "dataset": "UNSW Test",
+      "exit_packets": 8,
+      "acc": 0.720578,
+      "f1": 0.288354,
+      "auc": 0.936037
+    },
+    {
+      "dataset": "UNSW Test",
+      "exit_packets": 16,
+      "acc": 0.551292,
+      "f1": 0.200461,
+      "auc": 0.88954
+    },
+    {
+      "dataset": "UNSW Test",
+      "exit_packets": 32,
+      "acc": 0.546505,
+      "f1": 0.186033,
+      "auc": 0.870522
+    },
+    {
+      "dataset": "CIC-IDS-2017",
+      "exit_packets": 8,
+      "acc": 0.188236,
+      "f1": 0.31587,
+      "auc": 0.649476
+    },
+    {
+      "dataset": "CIC-IDS-2017",
+      "exit_packets": 16,
+      "acc": 0.198683,
+      "f1": 0.318647,
+      "auc": 0.617367
+    },
+    {
+      "dataset": "CIC-IDS-2017",
+      "exit_packets": 32,
+      "acc": 0.222098,
+      "f1": 0.321961,
+      "auc": 0.56244
+    },
+    {
+      "dataset": "CTU-13",
+      "exit_packets": 8,
+      "acc": 0.591784,
+      "f1": 0.741986,
+      "auc": 0.751231
+    },
+    {
+      "dataset": "CTU-13",
+      "exit_packets": 16,
+      "acc": 0.600701,
+      "f1": 0.744699,
+      "auc": 0.682036
+    },
+    {
+      "dataset": "CTU-13",
+      "exit_packets": 32,
+      "acc": 0.598969,
+      "f1": 0.743884,
+      "auc": 0.66162
+    }
+  ]
+}

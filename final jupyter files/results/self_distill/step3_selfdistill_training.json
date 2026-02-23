@@ -1,0 +1,64 @@
+{
+  "step": "Step 3 \u2014 Self-Distillation Training",
+  "model": "UniMambaSSL",
+  "timestamp": "20260223_130341",
+  "config": {
+    "epochs": 5,
+    "lr": 3e-05,
+    "lambda_contrastive": 0.1,
+    "loss": "MSE(rep_8,sg(rep_32)) + MSE(rep_16,sg(rep_32)) + \u03bb*NT-Xent"
+  },
+  "best_val_auc_exit8": 0.87414,
+  "training_log": [
+    {
+      "epoch": 1,
+      "mse_loss": 0.125623,
+      "contrastive_loss": 6.45835,
+      "total_loss": 0.771458,
+      "val_acc_exit8": 0.720584,
+      "val_f1_exit8": 0.288389,
+      "val_auc_exit8": 0.761415,
+      "time_s": 228.4
+    },
+    {
+      "epoch": 2,
+      "mse_loss": 0.1598,
+      "contrastive_loss": 6.246564,
+      "total_loss": 0.784457,
+      "val_acc_exit8": 0.942543,
+      "val_f1_exit8": 0.0,
+      "val_auc_exit8": 0.87414,
+      "time_s": 232.0
+    },
+    {
+      "epoch": 3,
+      "mse_loss": 0.155764,
+      "contrastive_loss": 6.192876,
+      "total_loss": 0.775051,
+      "val_acc_exit8": 0.722302,
+      "val_f1_exit8": 0.287033,
+      "val_auc_exit8": 0.768445,
+      "time_s": 236.4
+    },
+    {
+      "epoch": 4,
+      "mse_loss": 0.048979,
+      "contrastive_loss": 6.16869,
+      "total_loss": 0.665848,
+      "val_acc_exit8": 0.720097,
+      "val_f1_exit8": 0.279982,
+      "val_auc_exit8": 0.740525,
+      "time_s": 236.9
+    },
+    {
+      "epoch": 5,
+      "mse_loss": 0.063761,
+      "contrastive_loss": 6.160819,
+      "total_loss": 0.679843,
+      "val_acc_exit8": 0.718602,
+      "val_f1_exit8": 0.268514,
+      "val_auc_exit8": 0.732618,
+      "time_s": 235.5
+    }
+  ]
+}

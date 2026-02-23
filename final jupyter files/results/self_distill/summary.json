@@ -1,0 +1,157 @@
+{
+  "experiment": "Predictive Self-Distillation for Early Exit",
+  "timestamp": "20260223_130341",
+  "model": {
+    "name": "UniMambaSSL",
+    "params": 1897493,
+    "d_model": 256,
+    "n_layers": 4,
+    "architecture": "forward-only Mamba + PacketEmbedder(136\u2192256)"
+  },
+  "hyperparameters": {
+    "ssl": {
+      "epochs": 1,
+      "lr": 5e-05,
+      "batch_size": 128,
+      "temperature": 0.5,
+      "augmentation": "AntiShortcut + CutMix 40%"
+    },
+    "self_distill": {
+      "epochs": 5,
+      "lr": 3e-05,
+      "lambda_contrastive": 0.1,
+      "loss": "MSE(rep_8, sg(rep_32)) + MSE(rep_16, sg(rep_32)) + \u03bb*NT-Xent"
+    }
+  },
+  "classification_method": "centroid_cosine_distance (no learned classifier)",
+  "datasets": {
+    "UNSW_pretrain": 787004,
+    "UNSW_train": 583968,
+    "UNSW_val": 125136,
+    "UNSW_test": 125137,
+    "CIC_IDS_2017": 1084972,
+    "CTU_13": 213627
+  },
+  "results": {
+    "baseline_centroid": {
+      "UNSW Test@8pkt": {
+        "acc": 0.804127,
+        "f1": 0.087555,
+        "auc": 0.68999
+      },
+      "UNSW Test@16pkt": {
+        "acc": 0.708519,
+        "f1": 0.069919,
+        "auc": 0.743732
+      },
+      "UNSW Test@32pkt": {
+        "acc": 0.643199,
+        "f1": 0.166981,
+        "auc": 0.72533
+      },
+      "CIC-IDS-2017@8pkt": {
+        "acc": 0.802548,
+        "f1": 0.003989,
+        "auc": 0.801907
+      },
+      "CIC-IDS-2017@16pkt": {
+        "acc": 0.671512,
+        "f1": 0.472697,
+        "auc": 0.679401
+      },
+      "CIC-IDS-2017@32pkt": {
+        "acc": 0.434257,
+        "f1": 0.370864,
+        "auc": 0.651148
+      },
+      "CTU-13@8pkt": {
+        "acc": 0.411109,
+        "f1": 0.264202,
+        "auc": 0.536773
+      },
+      "CTU-13@16pkt": {
+        "acc": 0.59478,
+        "f1": 0.712545,
+        "auc": 0.591118
+      },
+      "CTU-13@32pkt": {
+        "acc": 0.602897,
+        "f1": 0.737182,
+        "auc": 0.616736
+      }
+    },
+    "final_centroid": {
+      "UNSW Test@8pkt": {
+        "acc": 0.720578,
+        "f1": 0.288354,
+        "auc": 0.936037
+      },
+      "UNSW Test@16pkt": {
+        "acc": 0.551292,
+        "f1": 0.200461,
+        "auc": 0.88954
+      },
+      "UNSW Test@32pkt": {
+        "acc": 0.546505,
+        "f1": 0.186033,
+        "auc": 0.870522
+      },
+      "CIC-IDS-2017@8pkt": {
+        "acc": 0.188236,
+        "f1": 0.31587,
+        "auc": 0.649476
+      },
+      "CIC-IDS-2017@16pkt": {
+        "acc": 0.198683,
+        "f1": 0.318647,
+        "auc": 0.617367
+      },
+      "CIC-IDS-2017@32pkt": {
+        "acc": 0.222098,
+        "f1": 0.321961,
+        "auc": 0.56244
+      },
+      "CTU-13@8pkt": {
+        "acc": 0.591784,
+        "f1": 0.741986,
+        "auc": 0.751231
+      },
+      "CTU-13@16pkt": {
+        "acc": 0.600701,
+        "f1": 0.744699,
+        "auc": 0.682036
+      },
+      "CTU-13@32pkt": {
+        "acc": 0.598969,
+        "f1": 0.743884,
+        "auc": 0.66162
+      }
+    },
+    "knn_anomaly": {
+      "UNSW Test@8pkt": 0.984202,
+      "CIC-IDS-2017@8pkt": 0.592734,
+      "CTU-13@8pkt": 0.585533,
+      "UNSW Test@32pkt": 0.970589,
+      "CIC-IDS-2017@32pkt": 0.561927,
+      "CTU-13@32pkt": 0.611507
+    },
+    "latency": {
+      "model": "UniMamba Self-Distill",
+      "batch_size": 1,
+      "latency_ms": 0.6533,
+      "gpu": "NVIDIA GeForce RTX 4070 Ti SUPER",
+      "note": "centroid cosine distance adds negligible overhead"
+    },
+    "self_distill_delta": {
+      "UNSW Test@8pkt": 0.246047,
+      "UNSW Test@16pkt": 0.145808,
+      "UNSW Test@32pkt": 0.145192,
+      "CIC-IDS-2017@8pkt": -0.152431,
+      "CIC-IDS-2017@16pkt": -0.062034,
+      "CIC-IDS-2017@32pkt": -0.088708,
+      "CTU-13@8pkt": 0.214458,
+      "CTU-13@16pkt": 0.090919,
+      "CTU-13@32pkt": 0.044884
+    }
+  }
+}

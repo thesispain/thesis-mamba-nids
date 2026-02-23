@@ -1,0 +1,19 @@
+# Large data files - never commit
+*.pkl
+*.csv
+*.zip
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Environment
+mamba_env/
+
+# OS
+.DS_Store
+*.pth
+weights/

@@ -1,0 +1,9 @@
+Full pipeline started: 2026-02-21 06:31:51
+Device: cuda
+
+Loading datasets...
+  UNSW pretrain: 787,004   finetune: 834,241
+  CIC-IDS: 1,084,972   CTU-13: 213,627
+
+Waiting for SSL weights to be ready...
+  [06:31:57] New weights: ['bert_anti', 'bimamba_anti', 'bimamba_cutmix']

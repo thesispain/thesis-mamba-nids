@@ -1,0 +1,70 @@
+{
+  "step": "Step 2 \u2014 Pre-distillation Baseline (SSL only)",
+  "method": "centroid_distance",
+  "timestamp": "20260223_130341",
+  "results": [
+    {
+      "dataset": "UNSW Test",
+      "exit_packets": 8,
+      "acc": 0.804127,
+      "f1": 0.087555,
+      "auc": 0.68999
+    },
+    {
+      "dataset": "UNSW Test",
+      "exit_packets": 16,
+      "acc": 0.708519,
+      "f1": 0.069919,
+      "auc": 0.743732
+    },
+    {
+      "dataset": "UNSW Test",
+      "exit_packets": 32,
+      "acc": 0.643199,
+      "f1": 0.166981,
+      "auc": 0.72533
+    },
+    {
+      "dataset": "CIC-IDS-2017",
+      "exit_packets": 8,
+      "acc": 0.802548,
+      "f1": 0.003989,
+      "auc": 0.801907
+    },
+    {
+      "dataset": "CIC-IDS-2017",
+      "exit_packets": 16,
+      "acc": 0.671512,
+      "f1": 0.472697,
+      "auc": 0.679401
+    },
+    {
+      "dataset": "CIC-IDS-2017",
+      "exit_packets": 32,
+      "acc": 0.434257,
+      "f1": 0.370864,
+      "auc": 0.651148
+    },
+    {
+      "dataset": "CTU-13",
+      "exit_packets": 8,
+      "acc": 0.411109,
+      "f1": 0.264202,
+      "auc": 0.536773
+    },
+    {
+      "dataset": "CTU-13",
+      "exit_packets": 16,
+      "acc": 0.59478,
+      "f1": 0.712545,
+      "auc": 0.591118
+    },
+    {
+      "dataset": "CTU-13",
+      "exit_packets": 32,
+      "acc": 0.602897,
+      "f1": 0.737182,
+      "auc": 0.616736
+    }
+  ]
+}

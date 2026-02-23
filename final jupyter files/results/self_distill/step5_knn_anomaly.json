@@ -1,0 +1,45 @@
+{
+  "step": "Step 5 \u2014 k-NN Anomaly Detection (UniMamba SSL)",
+  "method": "knn_cosine",
+  "k": 10,
+  "n_train_sample": 20000,
+  "timestamp": "20260223_130341",
+  "results": [
+    {
+      "dataset": "UNSW Test",
+      "exit_packets": 8,
+      "knn_k": 10,
+      "auc": 0.984202
+    },
+    {
+      "dataset": "CIC-IDS-2017",
+      "exit_packets": 8,
+      "knn_k": 10,
+      "auc": 0.592734
+    },
+    {
+      "dataset": "CTU-13",
+      "exit_packets": 8,
+      "knn_k": 10,
+      "auc": 0.585533
+    },
+    {
+      "dataset": "UNSW Test",
+      "exit_packets": 32,
+      "knn_k": 10,
+      "auc": 0.970589
+    },
+    {
+      "dataset": "CIC-IDS-2017",
+      "exit_packets": 32,
+      "knn_k": 10,
+      "auc": 0.561927
+    },
+    {
+      "dataset": "CTU-13",
+      "exit_packets": 32,
+      "knn_k": 10,
+      "auc": 0.611507
+    }
+  ]
+}

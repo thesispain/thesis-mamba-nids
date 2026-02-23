@@ -1,0 +1,119 @@
+Started: 2026-02-21 06:34:41
+Device : cuda
+
+Loading datasets ...
+  UNSW pretrain (benign): 787,004
+  UNSW test:              125,137
+  CIC-IDS-2017:           1,084,972
+  CTU-13:                 213,627
+
+Waiting for Cell 10 to finish (polling GPU every 30s)...
+  [06:34:47] GPU=95%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:35:17] GPU=95%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:35:47] GPU=95%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:36:17] GPU=95%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:36:47] GPU=95%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:37:17] GPU=96%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:37:47] GPU=95%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:38:17] GPU=95%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:38:47] GPU=95%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:39:17] GPU=94%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:39:47] GPU=94%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:40:17] GPU=94%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:40:47] GPU=94%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:41:17] GPU=94%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:41:47] GPU=95%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:42:17] GPU=94%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:42:47] GPU=95%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:43:17] GPU=95%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:43:47] GPU=94%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:44:17] GPU=94%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:44:47] GPU=95%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:45:17] GPU=95%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:45:47] GPU=95%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:46:17] GPU=94%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:46:47] GPU=94%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:47:17] GPU=95%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:47:47] GPU=94%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:48:17] GPU=95%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:48:47] GPU=94%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:49:17] GPU=95%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:49:47] GPU=94%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:50:17] GPU=94%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth']
+  [06:50:47] GPU=87%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth', 'ssl_bimamba_both.pth']
+  [06:51:17] GPU=87%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth', 'ssl_bimamba_both.pth']
+  [06:51:47] GPU=87%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth', 'ssl_bimamba_both.pth']
+  [06:52:17] GPU=85%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth', 'ssl_bimamba_both.pth']
+  [06:52:47] GPU=85%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth', 'ssl_bimamba_both.pth']
+  [06:53:17] GPU=86%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth', 'ssl_bimamba_both.pth']
+  [06:53:47] GPU=85%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth', 'ssl_bimamba_both.pth']
+  [06:54:17] GPU=85%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth', 'ssl_bimamba_both.pth']
+  [06:54:47] GPU=85%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth', 'ssl_bimamba_both.pth']
+  [06:55:17] GPU=87%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth', 'ssl_bimamba_both.pth']
+  [06:55:47] GPU=87%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth', 'ssl_bimamba_both.pth']
+  [06:56:17] GPU=87%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth', 'ssl_bimamba_both.pth']
+  [06:56:47] GPU=85%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth', 'ssl_bimamba_both.pth']
+  [06:57:17] GPU=85%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth', 'ssl_bimamba_both.pth']
+  [06:57:47] GPU=86%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth', 'ssl_bimamba_both.pth']
+  [06:58:17] GPU=87%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth', 'ssl_bimamba_both.pth']
+  [06:58:47] GPU=85%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth', 'ssl_bimamba_both.pth']
+  [06:59:17] GPU=87%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth', 'ssl_bimamba_both.pth']
+  [06:59:47] GPU=86%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth', 'ssl_bimamba_both.pth']
+  [07:00:17] GPU=3%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert_both.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth', 'ssl_bimamba_both.pth']
+  [07:00:47] GPU=3%   weights: ['ssl_bimamba_cutmix.pth', 'ssl_bert_anti.pth', 'ssl_bert_both.pth', 'ssl_bert.pth', 'ssl_bert_paper.pth', 'ssl_bimamba_paper.pth', 'ssl_bimamba.pth', 'ssl_bimamba_anti.pth', 'ssl_bimamba_both.pth']
+  GPU idle — training complete!
+
+============================================================
+ALL WEIGHT FILES ON DISK
+============================================================
+  2026-02-21 01:13   18.4MB  weights/phase2_ssl/ssl_bert.pth
+  2026-02-21 06:24   18.4MB  weights/phase2_ssl/ssl_bert_anti.pth
+  2026-02-21 06:59   18.4MB  weights/phase2_ssl/ssl_bert_both.pth
+  2026-02-21 02:13   18.4MB  weights/phase2_ssl/ssl_bert_paper.pth
+  2026-02-21 01:02   14.8MB  weights/phase2_ssl/ssl_bimamba.pth
+  2026-02-21 06:16   14.8MB  weights/phase2_ssl/ssl_bimamba_anti.pth
+  2026-02-21 06:50   14.8MB  weights/phase2_ssl/ssl_bimamba_both.pth
+  2026-02-21 05:40   14.8MB  weights/phase2_ssl/ssl_bimamba_cutmix.pth
+  2026-02-21 02:11   14.8MB  weights/phase2_ssl/ssl_bimamba_paper.pth
+
+============================================================
+PHASE 2 — UNSUPERVISED SIMILARITY AUC
+Method: max cosine similarity to benign train set
+Higher = more benign → AUC reported as anomaly score
+============================================================
+
+Variant                  UNSW-NB15     CIC-IDS      CTU-13  Note
+────────────────────────────────────────────────────────────────────────────────
+bimamba_cutmix              0.8819      0.4416      0.5348  
+bimamba_anti                0.6323      0.4147      0.5889  
+bimamba_both                0.9133      0.1739      0.4311  
+bimamba_paper               0.9506      0.1846      0.5218  
+bert_anti                   0.4996      0.4954      0.4995  PARTIAL — LR too high, diverged ep3 (4.69→4.98→5.54)
+bert_paper                  0.9643      0.3192      0.6475  old 1-epoch paper params
+bert_cutmix                      —           —           —  (weights not found)
+────────────────────────────────────────────────────────────────────────────────
+
+============================================================
+SUMMARY
+============================================================
+Best BiMamba variant (CIC AUC): bimamba_cutmix
+  UNSW=0.8819  CIC=0.4416  CTU=0.5348
+
+Paper target CIC AUC = 0.84
+Best achieved         = bimamba_cutmix: 0.4416  (gap = 0.3984)
+
+============================================================
+ALL .pth FILES (final listing)
+============================================================
+  [01:13]   18.4MB  weights/phase2_ssl/ssl_bert.pth
+  [06:24]   18.4MB  weights/phase2_ssl/ssl_bert_anti.pth
+  [06:59]   18.4MB  weights/phase2_ssl/ssl_bert_both.pth
+  [02:13]   18.4MB  weights/phase2_ssl/ssl_bert_paper.pth
+  [01:02]   14.8MB  weights/phase2_ssl/ssl_bimamba.pth
+  [06:16]   14.8MB  weights/phase2_ssl/ssl_bimamba_anti.pth
+  [06:50]   14.8MB  weights/phase2_ssl/ssl_bimamba_both.pth
+  [05:40]   14.8MB  weights/phase2_ssl/ssl_bimamba_cutmix.pth
+  [02:11]   14.8MB  weights/phase2_ssl/ssl_bimamba_paper.pth
+
+Completed: 2026-02-21 07:12:47
+Results  : /home/T2510596/Downloads/totally fresh/thesis_final/final jupyter files/UNSUPERVISED_EVAL_RESULTS.txt

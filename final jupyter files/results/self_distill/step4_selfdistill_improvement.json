@@ -1,0 +1,69 @@
+{
+  "step": "Step 4 \u2014 Self-Distillation AUC Improvement",
+  "timestamp": "20260223_130341",
+  "results": [
+    {
+      "dataset": "UNSW Test",
+      "exit_packets": 8,
+      "auc_before": 0.68999,
+      "auc_after": 0.936037,
+      "auc_delta": 0.246047
+    },
+    {
+      "dataset": "UNSW Test",
+      "exit_packets": 16,
+      "auc_before": 0.743732,
+      "auc_after": 0.88954,
+      "auc_delta": 0.145808
+    },
+    {
+      "dataset": "UNSW Test",
+      "exit_packets": 32,
+      "auc_before": 0.72533,
+      "auc_after": 0.870522,
+      "auc_delta": 0.145192
+    },
+    {
+      "dataset": "CIC-IDS-2017",
+      "exit_packets": 8,
+      "auc_before": 0.801907,
+      "auc_after": 0.649476,
+      "auc_delta": -0.152431
+    },
+    {
+      "dataset": "CIC-IDS-2017",
+      "exit_packets": 16,
+      "auc_before": 0.679401,
+      "auc_after": 0.617367,
+      "auc_delta": -0.062034
+    },
+    {
+      "dataset": "CIC-IDS-2017",
+      "exit_packets": 32,
+      "auc_before": 0.651148,
+      "auc_after": 0.56244,
+      "auc_delta": -0.088708
+    },
+    {
+      "dataset": "CTU-13",
+      "exit_packets": 8,
+      "auc_before": 0.536773,
+      "auc_after": 0.751231,
+      "auc_delta": 0.214458
+    },
+    {
+      "dataset": "CTU-13",
+      "exit_packets": 16,
+      "auc_before": 0.591118,
+      "auc_after": 0.682036,
+      "auc_delta": 0.090919
+    },
+    {
+      "dataset": "CTU-13",
+      "exit_packets": 32,
+      "auc_before": 0.616736,
+      "auc_after": 0.66162,
+      "auc_delta": 0.044884
+    }
+  ]
+}
