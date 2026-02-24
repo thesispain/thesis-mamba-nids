@@ -1,0 +1,176 @@
+{
+  "timestamp": "20260224_234926",
+  "model": "UniMambaSSL v2",
+  "ssl_encoder": "unimamba_ssl_v2.pth",
+  "encoder_params": 1797520,
+  "exit_point": 8,
+  "experiment_A": {
+    "description": "SSL pretrain UNSW \u2192 fine-tune UNSW labeled \u2192 test CIC (cross-dataset)",
+    "train_data": "UNSW-NB15 (80% with SMOTE)",
+    "test_data": "CIC-IDS-2017 (100%)",
+    "metrics": {
+      "auc": 0.10626293484067567,
+      "f1": 0.04170499439335926,
+      "accuracy": 0.20208355607333645,
+      "precision": 0.026908776134923842,
+      "recall": 0.09265015443331825
+    },
+    "per_attack": {
+      "Benign": {
+        "count": 881648,
+        "f1": 0.0,
+        "recall": 0.227320880895777,
+        "precision": 0.0,
+        "auc": null
+      },
+      "Bot": {
+        "count": 1228,
+        "f1": 0.7507629704984741,
+        "recall": 0.6009771986970684,
+        "precision": 1.0,
+        "auc": null
+      },
+      "DDoS": {
+        "count": 24599,
+        "f1": 0.5987068842746874,
+        "recall": 0.4272531403715598,
+        "precision": 1.0,
+        "auc": null
+      },
+      "DoS GoldenEye": {
+        "count": 7458,
+        "f1": 0.6764862466725821,
+        "recall": 0.5111289890050952,
+        "precision": 1.0,
+        "auc": null
+      },
+      "DoS Hulk": {
+        "count": 6355,
+        "f1": 0.7349457549517269,
+        "recall": 0.5809598741148702,
+        "precision": 1.0,
+        "auc": null
+      },
+      "FTP-Patator": {
+        "count": 2500,
+        "f1": 0.015085351329892815,
+        "recall": 0.0076,
+        "precision": 1.0,
+        "auc": null
+      },
+      "Infiltration": {
+        "count": 6,
+        "f1": 0.9090909090909091,
+        "recall": 0.8333333333333334,
+        "precision": 1.0,
+        "auc": null
+      },
+      "PortScan": {
+        "count": 158239,
+        "f1": 0.0006696484977130872,
+        "recall": 0.00033493639368297324,
+        "precision": 1.0,
+        "auc": null
+      },
+      "SSH-Patator": {
+        "count": 2935,
+        "f1": 0.004080244814688882,
+        "recall": 0.0020442930153321977,
+        "precision": 1.0,
+        "auc": null
+      }
+    },
+    "benchmark": {
+      "latency_ms": 0.7028679829090834,
+      "latency_p95_ms": 0.7682529307203366,
+      "throughput_fps": 35041.438007134595,
+      "ttd_ms": 41.99972772412002,
+      "mean_8pkt_iat_ms": 41.29685974121094
+    }
+  },
+  "experiment_B": {
+    "description": "SSL pretrain UNSW \u2192 fine-tune CIC 10% \u2192 test CIC 90% (few-shot)",
+    "train_data": "CIC-IDS-2017 10% + SMOTE",
+    "test_data": "CIC-IDS-2017 90%",
+    "metrics": {
+      "auc": 0.9968989578611288,
+      "f1": 0.9388976369835653,
+      "accuracy": 0.9757197090338576,
+      "recall": 0.9954586937869904,
+      "precision": 0.8884185061989719
+    },
+    "per_attack": {
+      "Benign": {
+        "count": 793484,
+        "recall_ssl": 0.9711676605955507,
+        "recall_no_ssl": 0.8800177445291902,
+        "delta": 0.09114991606636047
+      },
+      "Bot": {
+        "count": 1106,
+        "recall_ssl": 0.9963833634719711,
+        "recall_no_ssl": 0.9755877034358047,
+        "delta": 0.020795660036166397
+      },
+      "DDoS": {
+        "count": 22140,
+        "recall_ssl": 0.9988256549232158,
+        "recall_no_ssl": 0.8149051490514905,
+        "delta": 0.18392050587172537
+      },
+      "DoS GoldenEye": {
+        "count": 6713,
+        "recall_ssl": 0.9891255772381945,
+        "recall_no_ssl": 0.9964248473111873,
+        "delta": -0.007299270072992803
+      },
+      "DoS Hulk": {
+        "count": 5720,
+        "recall_ssl": 0.9903846153846154,
+        "recall_no_ssl": 0.9942307692307693,
+        "delta": -0.0038461538461538325
+      },
+      "FTP-Patator": {
+        "count": 2250,
+        "recall_ssl": 1.0,
+        "recall_no_ssl": 1.0,
+        "delta": 0.0
+      },
+      "PortScan": {
+        "count": 142416,
+        "recall_ssl": 0.9953095157847432,
+        "recall_no_ssl": 0.9957729468599034,
+        "delta": -0.0004634310751601145
+      },
+      "SSH-Patator": {
+        "count": 2642,
+        "recall_ssl": 0.9981074943224829,
+        "recall_no_ssl": 0.9965934897804694,
+        "delta": 0.0015140045420135584
+      }
+    },
+    "benchmark": {
+      "latency_ms": 0.6978800229262561,
+      "latency_p95_ms": 0.7316241652006282,
+      "throughput_fps": 35178.45820538986,
+      "ttd_ms": 41.994739764137194,
+      "mean_8pkt_iat_ms": 41.29685974121094
+    }
+  },
+  "experiment_C": {
+    "description": "SSL kNN zero-shot \u2014 no fine-tuning (reference)",
+    "train_data": "UNSW benign only (pretrain)",
+    "test_data": "CIC-IDS-2017 100%",
+    "metrics": {
+      "auc": 0.92,
+      "f1": null
+    },
+    "benchmark": {
+      "latency_ms": 0.6344829744193703,
+      "latency_p95_ms": 0.654997956007719,
+      "throughput_fps": 37305.98844263766,
+      "ttd_ms": 41.93134271563031,
+      "mean_8pkt_iat_ms": 41.29685974121094
+    }
+  }
+}

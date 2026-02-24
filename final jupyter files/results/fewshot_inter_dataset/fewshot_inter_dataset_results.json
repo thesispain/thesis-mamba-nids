@@ -1,0 +1,76 @@
+{
+  "timestamp": "20260224_213337",
+  "experiment": "Few-shot inter-dataset: CIC 10% fine-tune \u2192 CIC 90% test",
+  "config": {
+    "finetune_split": 0.1,
+    "n_epochs": 30,
+    "patience": 3,
+    "smote_target": 15823,
+    "exit_point": 8
+  },
+  "with_ssl_pretrain": {
+    "auc": 0.9968989578611288,
+    "f1": 0.9388976369835653,
+    "accuracy": 0.9757197090338576,
+    "recall": 0.9954586937869904,
+    "precision": 0.8884185061989719
+  },
+  "without_pretrain": {
+    "auc": 0.9879292654714225,
+    "f1": 0.7808933247148789,
+    "accuracy": 0.8975934769184134,
+    "recall": 0.9738068824561308,
+    "precision": 0.6517750678498014
+  },
+  "ssl_knn_zero_shot_auc": 0.92,
+  "per_attack": {
+    "Benign": {
+      "count": 793484,
+      "recall_ssl": 0.9711676605955507,
+      "recall_no_ssl": 0.8800177445291902,
+      "delta": 0.09114991606636047
+    },
+    "Bot": {
+      "count": 1106,
+      "recall_ssl": 0.9963833634719711,
+      "recall_no_ssl": 0.9755877034358047,
+      "delta": 0.020795660036166397
+    },
+    "DDoS": {
+      "count": 22140,
+      "recall_ssl": 0.9988256549232158,
+      "recall_no_ssl": 0.8149051490514905,
+      "delta": 0.18392050587172537
+    },
+    "DoS GoldenEye": {
+      "count": 6713,
+      "recall_ssl": 0.9891255772381945,
+      "recall_no_ssl": 0.9964248473111873,
+      "delta": -0.007299270072992803
+    },
+    "DoS Hulk": {
+      "count": 5720,
+      "recall_ssl": 0.9903846153846154,
+      "recall_no_ssl": 0.9942307692307693,
+      "delta": -0.0038461538461538325
+    },
+    "FTP-Patator": {
+      "count": 2250,
+      "recall_ssl": 1.0,
+      "recall_no_ssl": 1.0,
+      "delta": 0.0
+    },
+    "PortScan": {
+      "count": 142416,
+      "recall_ssl": 0.9953095157847432,
+      "recall_no_ssl": 0.9957729468599034,
+      "delta": -0.0004634310751601145
+    },
+    "SSH-Patator": {
+      "count": 2642,
+      "recall_ssl": 0.9981074943224829,
+      "recall_no_ssl": 0.9965934897804694,
+      "delta": 0.0015140045420135584
+    }
+  }
+}
