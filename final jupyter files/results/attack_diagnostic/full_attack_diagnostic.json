@@ -1,0 +1,235 @@
+{
+  "timestamp": "20260224_063817",
+  "unsw_overall": {
+    "auc": 0.9828661145339547,
+    "f1": 0.7299476083113007,
+    "precision": 0.5916178055898824,
+    "recall": 0.9527055635532221
+  },
+  "unsw_per_attack": {
+    "Analysis": {
+      "count": 263,
+      "auc": 0.9556696186978042,
+      "f1": 0.009550786214910846,
+      "precision": 0.004798306909197059,
+      "recall": 1.0
+    },
+    "Backdoor": {
+      "count": 213,
+      "auc": 0.9676051367523695,
+      "f1": 0.0073704972490397595,
+      "precision": 0.0036988799166449596,
+      "recall": 1.0
+    },
+    "Backdoors": {
+      "count": 40,
+      "auc": 0.9665183061396475,
+      "f1": 0.00148030272190663,
+      "precision": 0.000740699590763476,
+      "recall": 1.0
+    },
+    "DoS": {
+      "count": 2584,
+      "auc": 0.9638621416941389,
+      "f1": 0.07076539078678497,
+      "precision": 0.036682638306342684,
+      "recall": 0.9984520123839009
+    },
+    "Exploits": {
+      "count": 18095,
+      "auc": 0.9742835334659017,
+      "f1": 0.40680864468369954,
+      "precision": 0.2553960899536671,
+      "recall": 0.9991710417242332
+    },
+    "Fuzzers": {
+      "count": 13747,
+      "auc": 0.9402164333218082,
+      "f1": 0.17399524770689082,
+      "precision": 0.09537214041131861,
+      "recall": 0.9907616207172474
+    },
+    "Generic": {
+      "count": 2675,
+      "auc": 0.9682155516915602,
+      "f1": 0.07317006355467894,
+      "precision": 0.037976483300868724,
+      "recall": 0.9985046728971962
+    },
+    "Reconnaissance": {
+      "count": 8421,
+      "auc": 0.9712620459522262,
+      "f1": 0.267660360532518,
+      "precision": 0.15455632183908047,
+      "recall": 0.9979812373827336
+    },
+    "Shellcode": {
+      "count": 1083,
+      "auc": 0.9689493312052134,
+      "f1": 0.029302344458123082,
+      "precision": 0.014869020813883244,
+      "recall": 1.0
+    },
+    "Worms": {
+      "count": 115,
+      "auc": 0.9539910298193923,
+      "f1": 0.003354138715510704,
+      "precision": 0.0016798866441707933,
+      "recall": 1.0
+    }
+  },
+  "cic_overall": {
+    "auc": 0.9192441652336215,
+    "f1_binary": 0.7204990118840255
+  },
+  "cic_per_attack": {
+    "Bot": {
+      "count": 1228,
+      "auc": 0.5519130541087675,
+      "f1": 0.0035030141714151174,
+      "precision": 0.00175460043289732,
+      "recall": 0.993485342019544
+    },
+    "DDoS": {
+      "count": 24599,
+      "auc": 0.7388113792830442,
+      "f1": 0.1272495004055064,
+      "precision": 0.0680621592426575,
+      "recall": 0.9758933289971137
+    },
+    "DoS GoldenEye": {
+      "count": 7458,
+      "auc": 0.5821421835591398,
+      "f1": 0.01777927354022933,
+      "precision": 0.008970045674948636,
+      "recall": 0.9916867792973988
+    },
+    "DoS Hulk": {
+      "count": 6355,
+      "auc": 0.561523811613331,
+      "f1": 0.015193730901020499,
+      "precision": 0.007655418828546271,
+      "recall": 0.9932336742722266
+    },
+    "DoS slowloris": {
+      "count": 2,
+      "auc": 0.5005027788786787,
+      "f1": 7.110428509974154e-06,
+      "precision": 3.555226894580412e-06,
+      "recall": 1.0
+    },
+    "FTP-Patator": {
+      "count": 2500,
+      "auc": 0.620249399337812,
+      "f1": 0.011807875724606643,
+      "precision": 0.005939271487666616,
+      "recall": 0.9924
+    },
+    "Infiltration": {
+      "count": 6,
+      "auc": 0.7335462585924352,
+      "f1": 3.141418821810871e-05,
+      "precision": 1.5707340825734908e-05,
+      "recall": 1.0
+    },
+    "PortScan": {
+      "count": 158239,
+      "auc": 0.9597254209057848,
+      "f1": 0.8918888226442949,
+      "precision": 0.8097025119722049,
+      "recall": 0.9926440384481702
+    },
+    "SSH-Patator": {
+      "count": 2935,
+      "auc": 0.5095554504485222,
+      "f1": 0.010544155044470364,
+      "precision": 0.005301020923507428,
+      "recall": 0.965587734241908
+    }
+  },
+  "synthetic_stats": {
+    "Bot": {
+      "real": 1228,
+      "synthetic": 3772,
+      "total": 5000
+    },
+    "FTP-Patator": {
+      "real": 2500,
+      "synthetic": 2500,
+      "total": 5000
+    },
+    "SSH-Patator": {
+      "real": 2935,
+      "synthetic": 2065,
+      "total": 5000
+    },
+    "DoS Hulk": {
+      "real": 6355,
+      "synthetic": 0,
+      "total": 6355
+    },
+    "DoS GoldenEye": {
+      "real": 7458,
+      "synthetic": 0,
+      "total": 7458
+    },
+    "DDoS": {
+      "real": 24599,
+      "synthetic": 0,
+      "total": 24599
+    },
+    "PortScan": {
+      "real": 158239,
+      "synthetic": 0,
+      "total": 158239
+    }
+  },
+  "root_cause_analysis": {
+    "problem": "Low per-attack F1 for DDoS, DoS GoldenEye, DoS Hulk",
+    "reason_1": "Model is BINARY anomaly detector, not multi-class classifier",
+    "reason_2": "One-vs-rest evaluation creates extreme class imbalance (169:1 for DoS Hulk)",
+    "reason_3": "k-NN anomaly score cannot distinguish attack subtypes",
+    "reason_4": "PortScan F1=0.89 ONLY because it is 78% of all attacks",
+    "reason_5": "High recall (~98%) proves model DETECTS attacks; low precision = cannot distinguish subtypes",
+    "conclusion": "Per-attack F1 is an UNFAIR metric for anomaly detectors. Binary AUC (0.92) is the correct metric.",
+    "real_world": "In production IDS, binary detection (attack vs benign) is what matters. Attack classification is a SEPARATE downstream task."
+  },
+  "synthetic_validation": {
+    "ks_test": {
+      "Protocol": {
+        "ks_stat": 0.0,
+        "p_value": 1.0
+      },
+      "Pkt_Length": {
+        "ks_stat": 0.4898,
+        "p_value": 0.0
+      },
+      "TCP_Flags": {
+        "ks_stat": 0.0002,
+        "p_value": 0.9999999999999996
+      },
+      "IAT": {
+        "ks_stat": 0.5036,
+        "p_value": 0.0
+      },
+      "Direction": {
+        "ks_stat": 0.0,
+        "p_value": 1.0
+      }
+    },
+    "correlation_divergence": 0.0804095226398513,
+    "tstr": {
+      "auc_real": 0.99997598,
+      "auc_synth": 0.99122426,
+      "ratio": 0.9912480697786361
+    },
+    "dcr": {
+      "mean": 0.5008640347659588,
+      "median": 0.3984104096889496,
+      "min": 0.1420598328113556,
+      "max": 18.28045654296875,
+      "zero_pct": 0.0
+    },
+    "verdict": "PASS"
+  }
+}

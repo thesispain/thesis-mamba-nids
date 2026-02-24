@@ -4,40 +4,119 @@
 
 This folder contains your complete thesis verification package for defense presentation.
 
+**📁 ORGANIZED FOLDER STRUCTURE** *(Updated: Feb 24, 2026)*
+
 ```
 final jupyter files/
-├── 📓 THESIS_FINAL_VERIFICATION.ipynb    [Main notebook - RUN THIS FIRST]
-├── 📊 COMPLETE_PROTOCOL_REPORT.md        [Detailed results/tables]
-├── 🚀 defense_slides/                    [7 publication-ready charts]
-│   ├── 01_indomain_vs_cross.png
-│   ├── 02_early_exit_distribution.png
-│   ├── 03_kd_student_comparison.png
-│   ├── 04_ttd_speedup.png
-│   ├── 05_performance_matrix.png
-│   ├── 06_early_exit_pie.png
-│   ├── 07_thesis_summary.png
-│   └── README.md                         [Chart usage guide]
-├── 📄 FRESH_VERIFICATION_FINAL_REPORT.md [Executive summary]
-└── README.md                             [This file]
+├── 📋 plans/                            [Strategy & Planning Documents]
+│   ├── BERT_SUPERVISED_ZEROSHOT_PLAN.md [Fix BERT generalization]
+│   ├── SYNTHETIC_DATASET_PLAN.md        [Data augmentation roadmap]
+│   └── MIGRATION_GUIDE.md               [Setup instructions]
+│
+├── 🔬 scripts/                          [Python Experiment Scripts]
+│   ├── benchmark_all_models.py          [BERT vs BiMamba vs UniMamba]
+│   ├── benchmark_batch32.py             [Batch scaling analysis]
+│   ├── bert_vs_unimamba_complete.py     [Accuracy + speed comparison]
+│   ├── comprehensive_metrics_report.py  [Per-attack metrics]
+│   ├── diagnose_overfit.py              [Cross-validation @8 vs @32]
+│   ├── run_self_distill_v2.py           [Self-distillation training]
+│   ├── run_ssl_v4.py                    [SSL pretraining]
+│   └── [+15 more analysis scripts...]
+│
+├── 📊 reports/                          [Defense-Ready Documentation]
+│   ├── COMPLETE_PROTOCOL_REPORT.md      [Detailed results/tables]
+│   ├── DEFENSE_DAY_CHECKLIST.md         [Pre-defense checklist]
+│   ├── DEFENSE_METRICS_SUMMARY.md       [Key numbers summary]
+│   ├── THESIS_ARGUMENT_FINAL.md         [Thesis positioning]
+│   ├── FRESH_VERIFICATION_FINAL_REPORT.md [Executive summary]
+│   ├── 00_VERIFICATION_SUMMARY.md       [Quick reference]
+│   └── defense_slides/                  [7 publication-ready charts]
+│
+├── 📓 notebooks/                        [Jupyter Notebooks]
+│   ├── FULL_PIPELINE_SSL_PRETRAINING.ipynb
+│   ├── THESIS_EVALUATION.ipynb
+│   └── THESIS_PIPELINE.ipynb
+│
+├── 📋 logs/                             [Execution Logs]
+│   ├── FULL_PIPELINE_RESULTS.txt
+│   ├── UNSUPERVISED_EVAL_RESULTS.txt
+│   ├── run_full_eval.log
+│   └── unsupervised_eval.log
+│
+├── 💾 weights/                          [Model Checkpoints]
+│   ├── phase2_ssl/      [SSL pretrained encoders]
+│   ├── phase3_teachers/ [Teacher models]
+│   ├── phase4_kd/       [Knowledge distillation]
+│   ├── phase5_ted/      [TED student models]
+│   └── self_distill/    [Self-distillation weights]
+│
+├── 📈 results/                          [JSON Result Files]
+│   ├── self_distill/    [Distillation metrics]
+│   └── self_distill_v2/ [Latest run results]
+│
+├── README.md            [This file]
+├── INDEX.md             [Quick navigation]
+└── CONTEXT_LOG.md       [Session history]
 ```
+
+---
+
+## � FOLDER ORGANIZATION GUIDE
+
+### 📋 **plans/** — Strategy Documents
+- `BERT_SUPERVISED_ZEROSHOT_PLAN.md` — Fix BERT cross-dataset generalization (CIC AUC: 0.627 → 0.85)
+- `SYNTHETIC_DATASET_PLAN.md` — Data augmentation roadmap (8-week implementation)
+- `MIGRATION_GUIDE.md` — Workspace setup instructions
+
+### 🔬 **scripts/** — Experiment Scripts (18 files)
+- `benchmark_*.py` — Latency/throughput comparisons
+- `bert_vs_unimamba_complete.py` — Full accuracy + speed comparison
+- `comprehensive_metrics_report.py` — Per-attack AUC/F1/Precision/Recall
+- `diagnose_overfit.py` — Cross-validation verification (@8 > @32)
+- `run_*.py` — Training pipelines (SSL, distillation, TED)
+
+### 📊 **reports/** — Defense Materials
+- `COMPLETE_PROTOCOL_REPORT.md` — Detailed results with all tables
+- `DEFENSE_DAY_CHECKLIST.md` — Pre-defense preparation
+- `DEFENSE_METRICS_SUMMARY.md` — Key metrics at-a-glance
+- `THESIS_ARGUMENT_FINAL.md` — Positioning & anticipated questions
+- `defense_slides/` — 7 publication-ready charts
+
+### 📓 **notebooks/** — Jupyter Notebooks
+- `THESIS_EVALUATION.ipynb` — Main evaluation notebook
+- `THESIS_PIPELINE.ipynb` — Full pipeline demonstration
+- `FULL_PIPELINE_SSL_PRETRAINING.ipynb` — SSL training walkthrough
+
+### 📋 **logs/** — Execution Logs
+- `FULL_PIPELINE_RESULTS.txt` — Complete pipeline run output
+- `UNSUPERVISED_EVAL_RESULTS.txt` — SSL evaluation results
+- `*.log` — Training/evaluation logs
+
+### 💾 **weights/** — Model Checkpoints
+- `phase2_ssl/` — SSL pretrained encoders (BERT, BiMamba, UniMamba)
+- `self_distill/` — Self-distillation checkpoints
+- `phase3_teachers/` — Teacher models for KD
+- `phase4_kd/`, `phase5_ted/` — Distillation variants
+
+### 📈 **results/** — JSON Results
+- `self_distill/`, `self_distill_v2/` — Experimental outputs
+- `*.json` — Benchmark results, metrics dumps
 
 ---
 
 ## 🚀 QUICK START (5 MINUTES)
 
-### Step 1: Run the Notebook
-1. Open `THESIS_FINAL_VERIFICATION.ipynb` in Jupyter
-2. Run all cells (Kernel → Restart & Run All)
-3. You'll see all verification results printed out
+### Step 1: Review Key Results
+1. Read **`reports/DEFENSE_METRICS_SUMMARY.md`** for key numbers
+2. Check **`reports/COMPLETE_PROTOCOL_REPORT.md`** for full details
 
-### Step 2: Review the Report
-1. Read `COMPLETE_PROTOCOL_REPORT.md` for detailed results
-2. All metrics, AUC values, speedup numbers documented
+### Step 2: Run Verification Scripts
+1. Execute **`scripts/bert_vs_unimamba_complete.py`** for accuracy vs speed comparison
+2. Run **`scripts/comprehensive_metrics_report.py`** for per-attack breakdown
 
-### Step 3: Grab Your Slides
-1. Open `defense_slides/` folder
-2. All 7 PNG charts are ready for PowerPoint/Google Slides
-3. Read `defense_slides/README.md` for talking points
+### Step 3: Grab Defense Materials
+1. Open **`reports/defense_slides/`** for charts
+2. Review **`reports/DEFENSE_DAY_CHECKLIST.md`** before defense
 
 ---
 

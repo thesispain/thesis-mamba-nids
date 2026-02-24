@@ -1,0 +1,79 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    THESIS FOLDER ORGANIZATION SUMMARY                        ║
+║                         Updated: February 24, 2026                           ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+📂 ROOT DIRECTORY: /thesis_final/final jupyter files/
+│
+├── 📋 plans/ ─────────────────────────── [3 files] Strategy & Planning
+│   ├── BERT_SUPERVISED_ZEROSHOT_PLAN.md    Fix BERT generalization (0.627→0.85 AUC)
+│   ├── SYNTHETIC_DATASET_PLAN.md           8-week data augmentation roadmap
+│   └── MIGRATION_GUIDE.md                  Environment setup guide
+│
+├── 🔬 scripts/ ───────────────────────── [18 files] Python Experiments
+│   ├── benchmark_all_models.py             BERT vs BiMamba vs UniMamba (B=1)
+│   ├── benchmark_batch32.py                Batch scaling (B=1,8,16,32,64)
+│   ├── bert_vs_unimamba_complete.py        🔥 Accuracy + speed comparison
+│   ├── comprehensive_metrics_report.py     Per-attack AUC/F1/Prec/Recall
+│   ├── diagnose_overfit.py                 5-fold CV: @8 > @32 validation
+│   ├── full_exit_comparison.py             Early exit timing analysis
+│   ├── run_self_distill_v2.py              Self-distillation training
+│   ├── run_ssl_v4.py                       SSL pretraining pipeline
+│   └── [+10 more inspection/evaluation scripts...]
+│
+├── 📊 reports/ ───────────────────────── [7 files + 1 folder] Defense Materials
+│   ├── COMPLETE_PROTOCOL_REPORT.md         Master results document
+│   ├── DEFENSE_DAY_CHECKLIST.md            Pre-defense TODO list
+│   ├── DEFENSE_METRICS_SUMMARY.md          Key numbers at-a-glance
+│   ├── THESIS_ARGUMENT_FINAL.md            Thesis positioning
+│   ├── FRESH_VERIFICATION_FINAL_REPORT.md  Executive summary
+│   ├── 00_VERIFICATION_SUMMARY.md          Quick reference card
+│   ├── ARCHITECTURE_AUDIT_AND_CLEANUP.md   Code review notes
+│   └── defense_slides/                     7 publication-ready charts (PNG)
+│
+├── 📓 notebooks/ ─────────────────────── [3 files] Jupyter Notebooks
+│   ├── THESIS_EVALUATION.ipynb             Main evaluation notebook
+│   ├── THESIS_PIPELINE.ipynb               Full pipeline demo
+│   └── FULL_PIPELINE_SSL_PRETRAINING.ipynb SSL training walkthrough
+│
+├── 📋 logs/ ──────────────────────────── [4 files] Execution Logs
+│   ├── FULL_PIPELINE_RESULTS.txt           Complete run output
+│   ├── UNSUPERVISED_EVAL_RESULTS.txt       SSL k-NN evaluation results
+│   ├── run_full_eval.log                   Full evaluation log
+│   └── unsupervised_eval.log               Unsupervised training log
+│
+├── 💾 weights/ ───────────────────────── [5 folders] Model Checkpoints
+│   ├── phase2_ssl/         SSL pretrained encoders (BERT, BiMamba, UniMamba)
+│   ├── phase3_teachers/    Teacher models for knowledge distillation
+│   ├── phase4_kd/          Knowledge distillation student models
+│   ├── phase5_ted/         TED (Teacher-student Early exit Distillation)
+│   └── self_distill/       Self-distillation checkpoints (v1, v2)
+│
+├── 📈 results/ ───────────────────────── [2 folders] JSON Metrics
+│   ├── self_distill/       Distillation experiment results
+│   └── self_distill_v2/    Latest run outputs (Feb 23, 2026)
+│
+└── 📄 ROOT FILES ─────────────────────── Documentation
+    ├── README.md           Main documentation (this structure guide)
+    ├── INDEX.md            Quick navigation
+    ├── CONTEXT_LOG.md      Session history
+    └── .gitignore          Git ignore rules
+
+────────────────────────────────────────────────────────────────────────────────
+KEY FILES FOR DEFENSE:
+────────────────────────────────────────────────────────────────────────────────
+📊 Main Results:      reports/DEFENSE_METRICS_SUMMARY.md
+📈 Charts:            reports/defense_slides/ (7 charts)
+🔬 Latest Script:     scripts/bert_vs_unimamba_complete.py
+📋 BERT Plan:         plans/BERT_SUPERVISED_ZEROSHOT_PLAN.md ← NEW!
+💾 Best Weights:      weights/self_distill/unimamba_ssl_v2.pth
+
+────────────────────────────────────────────────────────────────────────────────
+CRITICAL FINDINGS:
+────────────────────────────────────────────────────────────────────────────────
+✅ UniMamba @8 > @32 (validated 5-fold CV)
+✅ CIC-IDS AUC: UniMamba=0.920, BERT=0.627 (BERT overfits!)
+✅ Throughput: BERT=42K fps, UniMamba=32K fps (BERT 1.3x faster)
+✅ Time-to-Detect: UniMamba=70ms, BERT=310ms (UniMamba 4.4x faster!)
+❌ BERT needs supervised fine-tuning to improve CIC generalization
+────────────────────────────────────────────────────────────────────────────────

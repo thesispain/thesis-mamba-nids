@@ -241,4 +241,133 @@ The v4 script Phase 3 confirmed BERT CTU=0.3893 (existing loaded weights), not 0
 4. **Centroid shift proves it worked**: benign centroid shrank (10.79→6.75), attack expanded (10.96→15.32)
 
 ---
+
+### Session 5 (Feb 23–24 2026) — Self-Distill v2 + Causal Generalization Gradient Discovery
+
+#### Root-Cause Analysis of v1 Failure
+- v1 CIC self-distill failure (0.8019→0.6495) was diagnosed as two compounding bugs:
+  1. **1-epoch SSL** — insufficient for unidirectional model to build domain-invariant reps
+  2. **λ=0.1 contrastive term** — too weak; MSE alone forced rep@8 → rep@32 matching, baking in UNSW-specific app-layer patterns from late packets
+- Fix: 10-epoch SSL (cosine LR 5e-5→0) + λ=1.0 (10× stronger contrastive preservation)
+
+#### New Script: `run_self_distill_v2.py` (668 lines)
+- Step 1: SSL pretrain 10 epochs (NT-Xent τ=0.5 + MSE recon + AntiShortcut masking + CutMix 40%)
+- Step 2: k-NN eval BEFORE any self-distill (user's key requirement — baseline read)
+- Step 3: Self-distill 3 epochs LR=1e-5, λ=1.0 × NT-Xent(rep@8) + MSE(rep@8→sg(rep@32))
+- Step 4: Post-distill full eval
+
+#### SSL Training (Step 1) — 10 Epochs
+| Epoch | Loss  |
+|-------|-------|
+| 1     | 17.0939 |
+| 2     | 14.8225 |
+| 3     | 14.5920 |
+| 4     | 14.4917 |
+| 5     | 14.4078 |
+| 6     | 14.3611 |
+| 7     | 14.3093 |
+| 8     | 14.2847 |
+| 9     | 14.2733 |
+| 10    | 14.2510 |
+
+#### Pure SSL k-NN Results (Step 2 — BEFORE self-distill)
+| Dataset | Exit @8  | Exit @32 |
+|---------|----------|----------|
+| UNSW    | 0.9805   | —        |
+| CIC     | **0.8540** ✅ | —    |
+
+- CIC@8 = 0.8540 **exceeds the 0.80 target** — pure SSL before any labeled training
+- Compare v1: CIC@8 was 0.5927 after self-distill. v2 pure SSL already beats that.
+
+#### Post-Distill Results (Step 3 — AFTER self-distill)
+| Dataset | Exit @8  | Change vs pure SSL |
+|---------|----------|--------------------|
+| UNSW    | 0.9700   | −0.0105 |
+| CIC     | 0.5881   | **−0.2659** ❌ |
+
+- Self-distill STILL hurts CIC even with 10-epoch SSL and λ=1.0
+- Fundamental tension confirmed: self-distill and cross-dataset generalization are in conflict for this architecture
+
+#### KEY FINDING: Causal Generalization Gradient (@8 vs @32)
+Full @8 vs @32 metrics comparison run via `full_exit_comparison.py`:
+
+| Dataset | Exit | AUC    | F1     | Acc    |
+|---------|------|--------|--------|--------|
+| UNSW    | @8   | 0.9801 | 0.7362 | 0.9610 |
+| UNSW    | @32  | 0.9628 | 0.6023 | 0.9284 |
+| CIC     | @8   | **0.8517** | 0.7310 | 0.8932 |
+| CIC     | @32  | 0.6137 | 0.4406 | 0.5787 |
+| CTU     | @8   | 0.6285 | 0.7333 | 0.6780 |
+| CTU     | @32  | 0.5676 | 0.7539 | 0.6696 |
+
+- CIC Δ = **+0.238 AUC** at @8 vs @32 — headline cross-dataset result
+- Mechanistic explanation: CutMix (40%) swaps late packets during SSL → h[8:32] encodes UNSW-specific app-layer patterns; h[0:8] encodes universal TCP handshake / early-flow signals
+- `mean(h[0:32])` dilutes universal early signal with domain-specific late signal → CIC AUC collapses
+- BiMamba/BERT CANNOT show this pattern (bidirectional) → **unique thesis contribution**
+
+#### Plots Saved
+- `results/exit_comparison_roc.png` — ROC curves @8 vs @32 for all 3 datasets
+- `results/exit_comparison_bar.png` — Bar chart AUC comparison
+
+#### Weight Files
+| File | Status | Notes |
+|------|--------|-------|
+| `weights/self_distill/unimamba_ssl_v2.pth` | ✅ | 10-epoch SSL, 7.6 MB |
+| `weights/self_distill/unimamba_selfdist_v2.pth` | ✅ | post-distill, 7.6 MB |
+
+#### Open Issues for Next Session
+1. **Self-distill still hurts CIC** — consider dropping self-distill entirely and using pure SSL @8 for TED
+2. **Next token prediction SSL** — user asked about autoregressive pre-training (predict x[t+1] from h[t]); best approach is combined: NT-Xent + next-packet MSE prediction
+3. Update TED pipeline to use pure SSL v2 weights (`unimamba_ssl_v2.pth`) as base
+4. v4 UniMamba KD training was in-progress (ep 6/10 per Session 3) — confirm if still needed given pure SSL @8 already hits 0.85 CIC
+
+#### Key Numbers to Carry Forward
+- Pure SSL v2 @8 CIC AUC: **0.8540** (best result, no labels needed)
+- Post-distill @8 CIC AUC: **0.5881** (self-distill hurts, avoid it)
+- @8 vs @32 CIC gap: **Δ+0.238 AUC** (thesis headline)
+- UNSW @8: **0.9801** (strong in-domain)
+
+---
+
+### Session 6 (Feb 23 2026) — Multi-model @8 vs @32 comparison + v3 late-mask experiment
+
+#### Part 1: BERT vs BiMamba vs UniMamba @8 and @32 (read-only, no retraining)
+
+**Key finding confirmed:** BERT and BiMamba are bidirectional — @8 ≈ @32 (±0.02). Only UniMamba shows a real exit gap because it is causal.
+
+| Model | CIC @8 | CIC @32 | Gap |
+|-------|--------|---------|-----|
+| BERT SSL (1ep, bidirectional) | 0.6433 | 0.6253 | +0.018 |
+| BiMamba SSL (1ep, bidirectional) | 0.5323 | 0.6313 | −0.099 |
+| UniMamba SSL v2 (10ep, causal) | **0.8446** | 0.6125 | **+0.232** |
+
+**Conclusion:** The @8 benefit is unique to UniMamba's causality. BERT/BiMamba cannot demonstrate early-exit benefits because their hidden states already contain all 32 packets' information regardless of exit point.
+
+#### Part 2: UniMamba SSL v3 — late-packet masking (70% of positions 8-31 zeroed)
+
+Goal: force @32 to generalise like @8 by preventing model from relying on late packets.
+
+| Model | CIC @8 | CIC @32 |
+|-------|--------|---------|
+| v2 (random aug) | 0.8446 | 0.6125 |
+| v3 (70% late-mask) | 0.7769 | **0.7178** |
+
+Result: @32 improved (+0.106) but @8 degraded (−0.068). Late-mask too aggressive — it also corrupts early-packet representations since the model's hidden state for h[8] must summarise a mostly-zeroed sequence.
+
+Saved: `weights/self_distill/unimamba_ssl_v3_late_mask.pth`
+
+#### User decision: simplify SSL design for v4
+
+User wants:
+- **One augmentation only** (CutMix, both views same aug — not two different aug strategies)
+- **NT-Xent only** (drop MSE reconstruction loss — simpler, cleaner)
+- **Add next-packet prediction loss**: `MSE(Linear(h[t]), x[t+1])` — autoregressive loss natural for causal model
+
+Rationale: MSE reconstruction loss adds noise (reconstructing masked features that may not be informative) and two different augmentation views introduce asymmetry. Next-packet prediction is the natural SSL objective for a causal sequential model.
+
+#### Open for next session
+- Train v4: CutMix-only aug + NT-Xent + next-packet MSE prediction loss
+- Compare v4 @8 and @32 against v2 baseline
+
+---
 *Append below this line for new sessions*

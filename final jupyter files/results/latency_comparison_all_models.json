@@ -1,0 +1,140 @@
+{
+  "timestamp": "20260224_055402",
+  "device": "cuda",
+  "gpu": "NVIDIA GeForce RTX 4070 Ti SUPER",
+  "models": {
+    "BERT": {
+      "params": 3205776,
+      "size_mb": 12.22906494140625
+    },
+    "BiMamba": {
+      "params": 3548560,
+      "size_mb": 13.53668212890625
+    },
+    "UniMamba": {
+      "params": 1797520,
+      "size_mb": 6.85699462890625
+    }
+  },
+  "latency_benchmarks": {
+    "BERT @32 (full)": {
+      "median_ms": 0.4352129762992263,
+      "mean_ms": 0.43936168623622507,
+      "std_ms": 0.01629004799998952,
+      "min_ms": 0.4248530021868646,
+      "max_ms": 0.5986820324324071,
+      "throughput_fps": 2297.7256066750642,
+      "seq_len": 32,
+      "packets_needed": 32,
+      "note": "Full sequence + CLS token + attention"
+    },
+    "BERT @8 (trunc)": {
+      "median_ms": 0.4165740101598203,
+      "mean_ms": 0.4206787482253276,
+      "std_ms": 0.017717913947410152,
+      "min_ms": 0.4065160173922777,
+      "max_ms": 0.6169209955260158,
+      "throughput_fps": 2400.533820188028,
+      "seq_len": 8,
+      "packets_needed": 32,
+      "note": "Truncated input (NOT true early exit)"
+    },
+    "BiMamba @32 (full)": {
+      "median_ms": 1.22685800306499,
+      "mean_ms": 1.232015753746964,
+      "std_ms": 0.024802553820148347,
+      "min_ms": 1.1958389659412205,
+      "max_ms": 1.4029620215296745,
+      "throughput_fps": 815.090252907636,
+      "seq_len": 32,
+      "packets_needed": 32,
+      "note": "Bidirectional, requires full sequence"
+    },
+    "BiMamba @8 (trunc)": {
+      "median_ms": 1.2034740066155791,
+      "mean_ms": 1.2102989382692613,
+      "std_ms": 0.03214635842283454,
+      "min_ms": 1.174357021227479,
+      "max_ms": 1.740959007292986,
+      "throughput_fps": 830.9277927923091,
+      "seq_len": 8,
+      "packets_needed": 32,
+      "note": "Truncated input (NOT true early exit)"
+    },
+    "UniMamba @32 (full)": {
+      "median_ms": 0.6442679732572287,
+      "mean_ms": 0.6488362462841906,
+      "std_ms": 0.01878255927422368,
+      "min_ms": 0.6247079581953585,
+      "max_ms": 0.85435900837183,
+      "throughput_fps": 1552.1491700794859,
+      "seq_len": 32,
+      "packets_needed": 32,
+      "note": "Causal, full sequence"
+    },
+    "UniMamba @8 (TRUE)": {
+      "median_ms": 0.6388630135916173,
+      "mean_ms": 0.6427625310607255,
+      "std_ms": 0.016712595431564194,
+      "min_ms": 0.6203550146892667,
+      "max_ms": 0.7836490403860807,
+      "throughput_fps": 1565.2807859044935,
+      "seq_len": 32,
+      "packets_needed": 8,
+      "note": "TRUE early exit (causal)"
+    },
+    "UniMamba @16 (TRUE)": {
+      "median_ms": 0.6388684851117432,
+      "mean_ms": 0.6430377570795827,
+      "std_ms": 0.020748191638267837,
+      "min_ms": 0.6203019875101745,
+      "max_ms": 1.0560500086285174,
+      "throughput_fps": 1565.267380226295,
+      "seq_len": 32,
+      "packets_needed": 16,
+      "note": "TRUE early exit at 16"
+    }
+  },
+  "ttd_results": {
+    "BERT @32 (full)": {
+      "packets": 32,
+      "buffer_ms": 310.0,
+      "inference_ms": 0.4352129762992263,
+      "ttd_ms": 310.4352129762992
+    },
+    "BiMamba @32 (full)": {
+      "packets": 32,
+      "buffer_ms": 310.0,
+      "inference_ms": 1.22685800306499,
+      "ttd_ms": 311.226858003065
+    },
+    "UniMamba @32 (full)": {
+      "packets": 32,
+      "buffer_ms": 310.0,
+      "inference_ms": 0.6442679732572287,
+      "ttd_ms": 310.64426797325723
+    },
+    "UniMamba @16 (TRUE)": {
+      "packets": 16,
+      "buffer_ms": 150.0,
+      "inference_ms": 0.6388684851117432,
+      "ttd_ms": 150.63886848511174
+    },
+    "UniMamba @8 (TRUE)": {
+      "packets": 8,
+      "buffer_ms": 70.0,
+      "inference_ms": 0.6388630135916173,
+      "ttd_ms": 70.63886301359162
+    }
+  },
+  "summary": {
+    "bert_32_latency_ms": 0.4352129762992263,
+    "unimamba_8_latency_ms": 0.6388630135916173,
+    "inference_speedup": 0.6812305095774867,
+    "bert_32_ttd_ms": 310.4352129762992,
+    "unimamba_8_ttd_ms": 70.63886301359162,
+    "ttd_speedup": 4.394680204812589,
+    "time_saved_ms": 239.7963499627076,
+    "unimamba_throughput_fps": 1565.2807859044935
+  }
+}

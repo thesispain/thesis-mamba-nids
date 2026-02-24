@@ -1,0 +1,216 @@
+{
+  "all_batch_results": {
+    "batch_1": {
+      "BERT @32": {
+        "batch_time_ms": 0.4344270273577422,
+        "per_flow_ms": 0.4344270273577422,
+        "throughput_fps": 2301.8825649089267,
+        "mean_ms": 0.43986115138977766,
+        "std_ms": 0.038262700529450806,
+        "packets_needed": 32
+      },
+      "BiMamba @32": {
+        "batch_time_ms": 1.228672539582476,
+        "per_flow_ms": 1.228672539582476,
+        "throughput_fps": 813.886505789262,
+        "mean_ms": 1.2342226341133937,
+        "std_ms": 0.03388868950881149,
+        "packets_needed": 32
+      },
+      "UniMamba @32": {
+        "batch_time_ms": 0.6420610006898642,
+        "per_flow_ms": 0.6420610006898642,
+        "throughput_fps": 1557.4844118012888,
+        "mean_ms": 0.6488811183953658,
+        "std_ms": 0.03362148307806505,
+        "packets_needed": 32
+      },
+      "UniMamba @8 (TRUE)": {
+        "batch_time_ms": 0.6311414763331413,
+        "per_flow_ms": 0.6311414763331413,
+        "throughput_fps": 1584.4308090951079,
+        "mean_ms": 0.6358431946719065,
+        "std_ms": 0.022436640334850506,
+        "packets_needed": 8
+      }
+    },
+    "batch_8": {
+      "BERT @32": {
+        "batch_time_ms": 0.4507529956754297,
+        "per_flow_ms": 0.05634412445942871,
+        "throughput_fps": 17748.07949531743,
+        "mean_ms": 0.45271577837411314,
+        "std_ms": 0.01392242182739098,
+        "packets_needed": 32
+      },
+      "BiMamba @32": {
+        "batch_time_ms": 1.2505519844125956,
+        "per_flow_ms": 0.15631899805157445,
+        "throughput_fps": 6397.175087253752,
+        "mean_ms": 1.2567479484714568,
+        "std_ms": 0.03971863696534237,
+        "packets_needed": 32
+      },
+      "UniMamba @32": {
+        "batch_time_ms": 0.6673049938399345,
+        "per_flow_ms": 0.08341312422999181,
+        "throughput_fps": 11988.52110182012,
+        "mean_ms": 0.6709771766327322,
+        "std_ms": 0.015609312607990235,
+        "packets_needed": 32
+      },
+      "UniMamba @8 (TRUE)": {
+        "batch_time_ms": 0.6575064908247441,
+        "per_flow_ms": 0.08218831135309301,
+        "throughput_fps": 12167.180266106863,
+        "mean_ms": 0.6616473384201527,
+        "std_ms": 0.019245721847458524,
+        "packets_needed": 8
+      }
+    },
+    "batch_16": {
+      "BERT @32": {
+        "batch_time_ms": 0.5574449896812439,
+        "per_flow_ms": 0.034840311855077744,
+        "throughput_fps": 28702.383726058888,
+        "mean_ms": 0.5602847544942051,
+        "std_ms": 0.01737065299525675,
+        "packets_needed": 32
+      },
+      "BiMamba @32": {
+        "batch_time_ms": 1.4783515071030706,
+        "per_flow_ms": 0.09239696919394191,
+        "throughput_fps": 10822.865822589838,
+        "mean_ms": 1.486132142948918,
+        "std_ms": 0.031290445274117895,
+        "packets_needed": 32
+      },
+      "UniMamba @32": {
+        "batch_time_ms": 0.802478491095826,
+        "per_flow_ms": 0.05015490569348913,
+        "throughput_fps": 19938.229095899092,
+        "mean_ms": 0.8073618258349597,
+        "std_ms": 0.02932194972591577,
+        "packets_needed": 32
+      },
+      "UniMamba @8 (TRUE)": {
+        "batch_time_ms": 0.6996890006121248,
+        "per_flow_ms": 0.0437305625382578,
+        "throughput_fps": 22867.30245295032,
+        "mean_ms": 0.7033102504210547,
+        "std_ms": 0.02132375035606604,
+        "packets_needed": 8
+      }
+    },
+    "batch_32": {
+      "BERT @32": {
+        "batch_time_ms": 0.7558850047644228,
+        "per_flow_ms": 0.02362140639888821,
+        "throughput_fps": 42334.48183030571,
+        "mean_ms": 0.7597198080038652,
+        "std_ms": 0.02079624978297731,
+        "packets_needed": 32
+      },
+      "BiMamba @32": {
+        "batch_time_ms": 2.0037225040141493,
+        "per_flow_ms": 0.06261632825044217,
+        "throughput_fps": 15970.275293057262,
+        "mean_ms": 2.0136696497211233,
+        "std_ms": 0.03734982730113002,
+        "packets_needed": 32
+      },
+      "UniMamba @32": {
+        "batch_time_ms": 1.0638920066412538,
+        "per_flow_ms": 0.03324662520753918,
+        "throughput_fps": 30078.24083670407,
+        "mean_ms": 1.0703478788491338,
+        "std_ms": 0.026824315679906372,
+        "packets_needed": 32
+      },
+      "UniMamba @8 (TRUE)": {
+        "batch_time_ms": 1.0069400304928422,
+        "per_flow_ms": 0.03146687595290132,
+        "throughput_fps": 31779.449650380615,
+        "mean_ms": 1.011679669143632,
+        "std_ms": 0.020656111652934208,
+        "packets_needed": 8
+      }
+    },
+    "batch_64": {
+      "BERT @32": {
+        "batch_time_ms": 1.0747805063147098,
+        "per_flow_ms": 0.01679344541116734,
+        "throughput_fps": 59547.04204623894,
+        "mean_ms": 1.0799010482151061,
+        "std_ms": 0.029029145605852145,
+        "packets_needed": 32
+      },
+      "BiMamba @32": {
+        "batch_time_ms": 3.5208324843551964,
+        "per_flow_ms": 0.05501300756804994,
+        "throughput_fps": 18177.51917604252,
+        "mean_ms": 3.5410727625712752,
+        "std_ms": 0.09776172773403642,
+        "packets_needed": 32
+      },
+      "UniMamba @32": {
+        "batch_time_ms": 1.78541851346381,
+        "per_flow_ms": 0.027897164272872033,
+        "throughput_fps": 35845.9372507774,
+        "mean_ms": 1.7966214793268591,
+        "std_ms": 0.03884801146488811,
+        "packets_needed": 32
+      },
+      "UniMamba @8 (TRUE)": {
+        "batch_time_ms": 1.7056545184459537,
+        "per_flow_ms": 0.026650851850718027,
+        "throughput_fps": 37522.25278206475,
+        "mean_ms": 1.7135115899145603,
+        "std_ms": 0.03397472165753033,
+        "packets_needed": 8
+      }
+    }
+  },
+  "ttd_batch32": {
+    "BERT @32": {
+      "packets": 32,
+      "buffer_ms": 310.0,
+      "inference_ms": 0.02362140639888821,
+      "ttd_ms": 310.0236214063989,
+      "throughput_fps": 42334.48183030571
+    },
+    "BiMamba @32": {
+      "packets": 32,
+      "buffer_ms": 310.0,
+      "inference_ms": 0.06261632825044217,
+      "ttd_ms": 310.06261632825044,
+      "throughput_fps": 15970.275293057262
+    },
+    "UniMamba @32": {
+      "packets": 32,
+      "buffer_ms": 310.0,
+      "inference_ms": 0.03324662520753918,
+      "ttd_ms": 310.03324662520754,
+      "throughput_fps": 30078.24083670407
+    },
+    "UniMamba @8 (TRUE)": {
+      "packets": 8,
+      "buffer_ms": 70.0,
+      "inference_ms": 0.03146687595290132,
+      "ttd_ms": 70.0314668759529,
+      "throughput_fps": 31779.449650380615
+    }
+  },
+  "summary": {
+    "bert_inference_latency_b1": 0.4344270273577422,
+    "unimamba_inference_latency_b1": 0.6311414763331413,
+    "bert_inference_latency_b32": 0.02362140639888821,
+    "unimamba_inference_latency_b32": 0.03146687595290132,
+    "bert_throughput_b32": 42334.48183030571,
+    "unimamba_throughput_b32": 31779.449650380615,
+    "bert_ttd": 310.0236214063989,
+    "unimamba_ttd": 70.0314668759529,
+    "ttd_speedup": 4.4269188585688966,
+    "time_saved_ms": 239.992154530446
+  }
+}
